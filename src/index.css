@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-golden-brown-50: #fefce8;
+  --color-golden-brown-100: #fef9c3;
+  --color-golden-brown-700: #a16207;
+  --color-golden-brown-800: #854d0e;
+}
+
+@layer base {
+  .dark {
+    color-scheme: dark;
+  }
+}
