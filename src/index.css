@@ -1,6 +1,8 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
 @theme {
+  --font-sans: "Poppins", sans-serif;
   --color-golden-brown-50: #fefce8;
   --color-golden-brown-100: #fef9c3;
   --color-golden-brown-700: #a16207;
@@ -8,6 +10,9 @@
 }
 
 @layer base {
+  body {
+    @apply font-sans;
+  }
   .dark {
     color-scheme: dark;
   }
