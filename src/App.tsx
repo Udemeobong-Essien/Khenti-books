@@ -289,11 +289,10 @@ export default function App() {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const filteredBooks = booksState.filter(
-    (book) =>
-      (book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredBooks = booksState.filter((book) => {
+    const query = searchQuery.toLowerCase();
+    return book.title.toLowerCase().includes(query) || book.author.toLowerCase().includes(query);
+  });
   
   const categories = ['All', 'Fiction', 'Dystopian', 'Fantasy', 'Classic'];
   
@@ -516,7 +515,7 @@ export default function App() {
         ) : (
           <>
             <section className="bg-golden-brown-800 text-white rounded-3xl p-8 md:p-16 mb-12 dark:bg-golden-brown-900">
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-8">Read, grow, repeat!</h1>
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-8">Read. Grow. Repeat.</h1>
               <div className="relative">
                 <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="flex items-center justify-between w-64 bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
                   <span>Browse Categories</span>
