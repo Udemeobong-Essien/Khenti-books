@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Search, Menu, X, Plus, Minus, Trash2, ChevronRight, CheckCircle, ArrowLeft, Loader2, Sun, Moon, Heart, ChevronUp, MessageCircle } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X, Plus, Minus, Trash2, ChevronRight, CheckCircle, ArrowLeft, Loader2, Sun, Moon, Heart, ChevronUp, MessageCircle, Instagram, Phone, ChevronDown } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { Skeleton } from './components/Skeleton';
 
@@ -347,14 +347,8 @@ export default function App() {
           </div>
         </div>
       )}
-      <div className="bg-golden-brown-800 text-white text-xs py-2 px-6 flex justify-center gap-6">
-        <a href="https://www.instagram.com/khentibooks/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex items-center gap-1">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.22.056 2.07.24 2.802.533.76.297 1.325.694 1.905 1.275.58.58.977 1.144 1.275 1.906.293.733.477 1.583.533 2.802.058 1.267.07 1.647.07 4.85s-.012 3.583-.07 4.85c-.056 1.22-.24 2.07-.533 2.802-.297.76-.694 1.325-1.275 1.905-.58.58-1.144.977-1.906 1.275-.733.293-1.583.477-2.802.533-1.267.058-1.647.07-4.85.07s-3.583-.012-4.85-.07c-1.22-.056-2.07-.24-2.802-.533-.76-.297-1.325-.694-1.905-1.275-.58-.58-.977-1.144-1.275-1.906-.293-.733-.477-1.583-.533-2.802-.058-1.267-.07-1.647-.07-4.85s.012-3.583.07-4.85c.056-1.22.24-2.07.533-2.802.297-.76.694-1.325 1.275-1.905.58-.58 1.144-.977 1.906-1.275.733-.293 1.583-.477 2.802-.533 1.267-.058 1.647-.07 4.85-.07m0-2.163c-3.257 0-3.667.014-4.947.072-1.274.058-2.144.26-2.908.56-.786.305-1.45.717-2.115 1.382s-1.077 1.33-1.382 2.115c-.3 0-.502 1.121-.56 2.908-.058 1.28-.072 1.689-.072 4.947s.014 3.667.072 4.947c.058 1.274.26 2.144.56 2.908.305.786.717 1.45 1.382 2.115s1.33 1.077 2.115 1.382c.764.3 1.634.502 2.908.56 1.28.058 1.689.072 4.947.072s3.667-.014 4.947-.072c1.274-.058 2.144-.26 2.908-.56.786-.305 1.45-.717 2.115-1.382s1.077-1.33 1.382-2.115c.3-.764.502-1.634.56-2.908.058-1.28.072-1.689.072-4.947s-.014-3.667-.072-4.947c-.058-1.274-.26-2.144-.56-2.908-.305-.786-.717-1.45-1.382-2.115s-1.33-1.077-2.115-1.382c-.764-.3-1.634-.502-2.908-.56-1.28-.058-1.689-.072-4.947-.072zM12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"/>
-          </svg>
-          Instagram
-        </a>
-        <a href="tel:+2348104972574" className="hover:underline">Phone: +234 810 497 2574</a>
+      <div className="bg-golden-brown-800 text-white text-xs py-2 px-6 flex justify-center">
+        WELCOME TO KHENTI BOOKS
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
         <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -522,14 +516,14 @@ export default function App() {
         ) : (
           <>
             <section className="bg-golden-brown-800 text-white rounded-3xl p-8 md:p-16 mb-12 dark:bg-golden-brown-900">
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4">Welcome to Khenti Books</h1>
-              <p className="text-base sm:text-lg md:text-xl text-golden-brown-100 mb-8">Read, grow, repeat!</p>
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-8">Read, grow, repeat!</h1>
               <div className="relative">
-                <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
-                  Browse Categories
+                <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="flex items-center justify-between w-64 bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
+                  <span>Browse Categories</span>
+                  <ChevronDown size={20} />
                 </button>
                 {isCategoriesOpen && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-stone-800 border rounded-2xl p-2 w-48 shadow-xl z-50 text-stone-900 dark:text-stone-100">
+                  <div className="absolute top-full left-0 mt-2 bg-white dark:bg-stone-800 border rounded-2xl p-2 w-48 shadow-xl z-50 text-stone-900 dark:text-stone-100">
                     {categories.map(cat => (
                       <button key={cat} onClick={() => { setSelectedCategory(cat === 'All' ? null : cat); setActiveView('products'); setIsCategoriesOpen(false); }} className="block w-full text-left px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-lg">{cat}</button>
                     ))}
@@ -845,6 +839,14 @@ export default function App() {
       )}
 
       <footer className="border-t border-stone-200 mt-20 py-16 text-center text-sm text-stone-500">
+        <div className="flex justify-center gap-6 mb-4">
+          <a href="https://www.instagram.com/khentibooks/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex items-center gap-2">
+            <Instagram size={18} /> Instagram
+          </a>
+          <a href="tel:+2348104972574" className="hover:underline flex items-center gap-2">
+            <Phone size={18} /> Phone: +234 810 497 2574
+          </a>
+        </div>
         Built with ❤️ by <a href="https://www.scaleupfoundation.org/" target="_blank" rel="noopener noreferrer" className="text-golden-brown-700 hover:underline">Scaleup Foundation</a>
       </footer>
 
