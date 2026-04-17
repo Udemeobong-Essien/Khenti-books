@@ -185,6 +185,7 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -200,6 +201,8 @@ export default function App() {
   const [isSearching, setIsSearching] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [wishlist, setWishlist] = useState<Book[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const booksPerPage = 8;
@@ -288,9 +291,15 @@ export default function App() {
 
   const filteredBooks = booksState.filter(
     (book) =>
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase())
+      (book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+  
+  const categories = ['All', 'Fiction', 'Dystopian', 'Fantasy', 'Classic'];
+  
+  const booksToDisplay = selectedCategory && selectedCategory !== 'All' 
+    ? filteredBooks.filter(b => b.synopsis.toLowerCase().includes(selectedCategory.toLowerCase())) 
+    : filteredBooks;
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -319,6 +328,7 @@ export default function App() {
     setOrders(prev => [...prev, newOrder]);
     setPurchasedBooks(prev => [...new Set([...prev, ...cart.map(item => item.id)])]);
     setIsCheckoutOpen(false); 
+    setConfirmedOrder(newOrder);
     setCart([]);
   };
 
@@ -338,8 +348,13 @@ export default function App() {
         </div>
       )}
       <div className="bg-golden-brown-800 text-white text-xs py-2 px-6 flex justify-center gap-6">
-        <a href="mailto:khentibooks@gmail.com" className="hover:underline">Email: khentibooks@gmail.com</a>
-        <a href="tel:+2348084012538" className="hover:underline">Phone: +234 808 401 2538</a>
+        <a href="https://www.instagram.com/khentibooks/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex items-center gap-1">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.22.056 2.07.24 2.802.533.76.297 1.325.694 1.905 1.275.58.58.977 1.144 1.275 1.906.293.733.477 1.583.533 2.802.058 1.267.07 1.647.07 4.85s-.012 3.583-.07 4.85c-.056 1.22-.24 2.07-.533 2.802-.297.76-.694 1.325-1.275 1.905-.58.58-1.144.977-1.906 1.275-.733.293-1.583.477-2.802.533-1.267.058-1.647.07-4.85.07s-3.583-.012-4.85-.07c-1.22-.056-2.07-.24-2.802-.533-.76-.297-1.325-.694-1.905-1.275-.58-.58-.977-1.144-1.275-1.906-.293-.733-.477-1.583-.533-2.802-.058-1.267-.07-1.647-.07-4.85s.012-3.583.07-4.85c.056-1.22.24-2.07.533-2.802.297-.76.694-1.325 1.275-1.905.58-.58 1.144-.977 1.906-1.275.733-.293 1.583-.477 2.802-.533 1.267-.058 1.647-.07 4.85-.07m0-2.163c-3.257 0-3.667.014-4.947.072-1.274.058-2.144.26-2.908.56-.786.305-1.45.717-2.115 1.382s-1.077 1.33-1.382 2.115c-.3 0-.502 1.121-.56 2.908-.058 1.28-.072 1.689-.072 4.947s.014 3.667.072 4.947c.058 1.274.26 2.144.56 2.908.305.786.717 1.45 1.382 2.115s1.33 1.077 2.115 1.382c.764.3 1.634.502 2.908.56 1.28.058 1.689.072 4.947.072s3.667-.014 4.947-.072c1.274-.058 2.144-.26 2.908-.56.786-.305 1.45-.717 2.115-1.382s1.077-1.33 1.382-2.115c.3-.764.502-1.634.56-2.908.058-1.28.072-1.689.072-4.947s-.014-3.667-.072-4.947c-.058-1.274-.26-2.144-.56-2.908-.305-.786-.717-1.45-1.382-2.115s-1.33-1.077-2.115-1.382c-.764-.3-1.634-.502-2.908-.56-1.28-.058-1.689-.072-4.947-.072zM12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"/>
+          </svg>
+          Instagram
+        </a>
+        <a href="tel:+2348104972574" className="hover:underline">Phone: +234 810 497 2574</a>
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
         <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -347,12 +362,8 @@ export default function App() {
             <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-24 h-24 object-contain" />
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm font-bold dark:text-stone-300">
-            <button onClick={() => setActiveView('products')} className="hover:text-golden-brown-400">Shop All</button>
-            <button onClick={() => setActiveView('orders')} className="hover:text-golden-brown-400">Orders</button>
-            <button onClick={() => setActiveView('wishlist')} className="hover:text-golden-brown-400">Wishlist ({wishlist.length})</button>
           </div>
           <div className="flex items-center gap-4">
-            <button onClick={() => setIsLoginOpen(true)} className="text-sm font-medium hover:text-golden-brown-700 text-stone-900 dark:text-stone-300">Login</button>
             <div className="relative">
               <Search className="w-5 h-5 absolute left-2 top-1/2 -translate-y-1/2 text-stone-400" />
               <input
@@ -378,15 +389,11 @@ export default function App() {
             <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800">
               {theme === 'light' ? <Moon className="w-5 h-5 dark:text-white" /> : <Sun className="w-5 h-5 dark:text-white" />}
             </button>
-            <Menu className="md:hidden w-5 h-5 cursor-pointer text-white" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
           </div>
         </nav>
         {isMobileMenuOpen && (
           <div className="md:hidden border-t p-4 bg-white dark:bg-stone-900">
             <div className="flex flex-col gap-4 text-sm font-bold dark:text-stone-300">
-              <button onClick={() => { setActiveView('products'); setIsMobileMenuOpen(false); }} className="hover:text-golden-brown-400">Shop All</button>
-              <button onClick={() => { setActiveView('orders'); setIsMobileMenuOpen(false); }} className="hover:text-golden-brown-400">Orders</button>
-              <button onClick={() => { setActiveView('wishlist'); setIsMobileMenuOpen(false); }} className="hover:text-golden-brown-400">Wishlist ({wishlist.length})</button>
             </div>
           </div>
         )}
@@ -515,15 +522,24 @@ export default function App() {
         ) : (
           <>
             <section className="bg-golden-brown-800 text-white rounded-3xl p-8 md:p-16 mb-12 dark:bg-golden-brown-900">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4">Welcome to Khenti Books</h1>
-              <p className="text-lg md:text-xl text-golden-brown-100 mb-8">Read, grow, repeat!</p>
-              <button onClick={() => setActiveView('products')} className="bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
-                Shop Now
-              </button>
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4">Welcome to Khenti Books</h1>
+              <p className="text-base sm:text-lg md:text-xl text-golden-brown-100 mb-8">Read, grow, repeat!</p>
+              <div className="relative">
+                <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
+                  Browse Categories
+                </button>
+                {isCategoriesOpen && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-stone-800 border rounded-2xl p-2 w-48 shadow-xl z-50 text-stone-900 dark:text-stone-100">
+                    {categories.map(cat => (
+                      <button key={cat} onClick={() => { setSelectedCategory(cat === 'All' ? null : cat); setActiveView('products'); setIsCategoriesOpen(false); }} className="block w-full text-left px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-lg">{cat}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </section>
 
             {isLoadingRecommendations ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="space-y-3">
                     <Skeleton className="aspect-square" />
@@ -535,13 +551,20 @@ export default function App() {
             ) : recommendations.length > 0 && (
               <section className="mb-12">
                 <h2 className="text-2xl font-bold mb-8">Recommended for You</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {recommendations.map((book) => (
                     <div key={book.id} className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex flex-col cursor-pointer hover:shadow-md transition" onClick={() => handleBookClick(book)}>
                       <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="aspect-square bg-stone-100 rounded-xl mb-4 object-cover" referrerPolicy="no-referrer" />
                       <h3 className="font-semibold mb-1">{book.title}</h3>
                       <p className="text-sm text-stone-500 mb-2">{book.author}</p>
                       <p className="text-golden-brown-700 font-bold mb-4">₦{book.price}</p>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); toggleWishlist(book); }}
+                        className={`w-full py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${wishlist.find(item => item.id === book.id) ? 'bg-red-100 text-red-600' : 'bg-stone-100 text-stone-900 hover:bg-stone-200'}`}
+                      >
+                        <Heart size={16} className={wishlist.find(item => item.id === book.id) ? 'fill-current' : ''} />
+                        {wishlist.find(item => item.id === book.id) ? 'Wishlisted' : 'Wishlist'}
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -550,11 +573,11 @@ export default function App() {
 
             <section>
               <h2 className="text-2xl font-bold mb-8">
-                {activeView === 'wishlist' ? 'Your Wishlist' : searchQuery ? `Search Results for "${searchQuery}"` : 'Latest Products'}
+                {selectedCategory ? selectedCategory : searchQuery ? `Search Results for "${searchQuery}"` : 'Latest Products'}
               </h2>
               {activeView === 'wishlist' ? (
                 wishlist.length > 0 ? (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {wishlist.map((book) => (
                       <div key={book.id} className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex flex-col cursor-pointer hover:shadow-md transition" onClick={() => handleBookClick(book)}>
                         <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="aspect-square bg-stone-100 rounded-xl mb-4 object-cover" referrerPolicy="no-referrer" />
@@ -576,7 +599,7 @@ export default function App() {
                   <p className="text-stone-500">Your wishlist is empty.</p>
                 )
               ) : isSearching ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[...Array(4)].map((_, i) => (
                     <div key={i} className="space-y-3">
                       <Skeleton className="aspect-square" />
@@ -587,7 +610,7 @@ export default function App() {
                 </div>
               ) : filteredBooks.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {filteredBooks.slice((currentPage - 1) * booksPerPage, currentPage * booksPerPage).map((book) => (
                       <div key={book.id} className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex flex-col cursor-pointer hover:shadow-md transition" onClick={() => handleBookClick(book)}>
                         <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="aspect-square bg-stone-100 rounded-xl mb-4 object-cover" referrerPolicy="no-referrer" />
@@ -597,15 +620,9 @@ export default function App() {
                         <div className="flex flex-col gap-2 mt-auto">
                           <button 
                             onClick={(e) => { e.stopPropagation(); setQuickViewBook(book); }}
-                            className="w-full bg-stone-100 text-stone-900 py-2 rounded-lg text-sm font-semibold hover:bg-stone-200 transition"
+                            className="w-full bg-golden-brown-700 text-white py-2 rounded-lg text-sm font-semibold hover:bg-golden-brown-800 transition"
                           >
                             Quick View
-                          </button>
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); toggleWishlist(book); }}
-                            className={`w-full py-2 rounded-lg text-sm font-semibold transition ${wishlist.find(item => item.id === book.id) ? 'bg-red-100 text-red-500' : 'bg-stone-100 text-stone-900 hover:bg-stone-200'}`}
-                          >
-                            Wishlist
                           </button>
                           <button 
                             onClick={(e) => { e.stopPropagation(); addToCart(book); }}
@@ -618,7 +635,7 @@ export default function App() {
                       </div>
                     ))}
                   </div>
-                  {filteredBooks.length > booksPerPage && (
+                  {booksToDisplay.length > booksPerPage && (
                     <div className="flex justify-center items-center gap-2 mt-8">
                       <button 
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
@@ -627,10 +644,10 @@ export default function App() {
                       >
                         Previous
                       </button>
-                      <span className="text-sm font-semibold">Page {currentPage} of {Math.ceil(filteredBooks.length / booksPerPage)}</span>
+                      <span className="text-sm font-semibold">Page {currentPage} of {Math.ceil(booksToDisplay.length / booksPerPage)}</span>
                       <button 
-                        onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredBooks.length / booksPerPage), p + 1))}
-                        disabled={currentPage === Math.ceil(filteredBooks.length / booksPerPage)}
+                        onClick={() => setCurrentPage(p => Math.min(Math.ceil(booksToDisplay.length / booksPerPage), p + 1))}
+                        disabled={currentPage === Math.ceil(booksToDisplay.length / booksPerPage)}
                         className="px-4 py-2 rounded-xl bg-stone-100 text-stone-900 font-semibold hover:bg-stone-200 disabled:opacity-50"
                       >
                         Next
@@ -647,37 +664,47 @@ export default function App() {
       </main>
 
       {quickViewBook && (
-        <div className="absolute top-0 left-0 w-full z-50 flex justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-3xl p-12 relative border border-stone-200 shadow-xl">
-            <div className="flex justify-end mb-8">
-              <button onClick={() => setQuickViewBook(null)} className="bg-stone-100 text-stone-900 px-6 py-3 rounded-xl font-semibold hover:bg-stone-200">Close</button>
-            </div>
-            <div className="w-full aspect-square bg-stone-100 rounded-xl mb-8 overflow-hidden">
-              <img src={quickViewBook.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={quickViewBook.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-            </div>
-            <h2 className="text-3xl font-bold mb-3">{quickViewBook.title}</h2>
-            <p className="text-stone-600 mb-3">{quickViewBook.author}</p>
-            <div className="flex gap-6 text-sm text-stone-500 mb-6">
-              <p>Published: {quickViewBook.publicationDate}</p>
-              <p>{quickViewBook.pageCount} pages</p>
-            </div>
-            <p className="text-golden-brown-700 font-bold text-2xl mb-8">₦{quickViewBook.price}</p>
-            <h3 className="font-semibold mb-3">Synopsis</h3>
-            <p className="text-stone-700 mb-10 leading-relaxed">{quickViewBook.synopsis}</p>
+        <div className="absolute top-20 left-0 w-full z-50 flex justify-center p-4">
+          <div className="bg-white dark:bg-stone-900 w-full max-w-md rounded-3xl p-4 md:p-6 relative border border-stone-200 dark:border-stone-700 shadow-2xl flex flex-col md:flex-row gap-4 md:gap-6">
             <button 
-              onClick={() => { addToCart(quickViewBook); setQuickViewBook(null); }}
-              disabled={addingToCart === quickViewBook.id}
-              className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold hover:bg-golden-brown-800 transition flex items-center justify-center gap-2"
+              onClick={() => setQuickViewBook(null)}
+              className="absolute -top-3 -right-3 p-2 bg-stone-900 text-white hover:bg-stone-700 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-stone-300 rounded-full shadow-xl transition z-10"
             >
-              {addingToCart === quickViewBook.id ? <Loader2 className="animate-spin" size={20} /> : 'Add to Cart'}
+              <X size={20} />
             </button>
+            <div className="w-full md:w-1/3 shrink-0">
+              <img src={quickViewBook.coverImageUrl || 'https://placehold.co/400x600?text=Book+Cover'} alt={quickViewBook.title} className="w-full aspect-[2/3] rounded-2xl object-cover shadow-md" referrerPolicy="no-referrer" />
+            </div>
+            <div className="w-full md:w-2/3 flex flex-col">
+              <h2 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-stone-900 dark:text-stone-100">{quickViewBook.title}</h2>
+              <p className="text-base md:text-lg text-stone-600 dark:text-stone-400 mb-3 md:mb-4">{quickViewBook.author}</p>
+              
+              <div className="flex gap-2 md:gap-4 text-xs md:text-sm text-stone-500 dark:text-stone-400 mb-4 md:mb-6 font-mono border-y py-2 md:py-3 border-stone-100 dark:border-stone-800">
+                <p>Published: {quickViewBook.publicationDate}</p>
+                <p>•</p>
+                <p>{quickViewBook.pageCount} pages</p>
+              </div>
+              
+              <p className="text-golden-brown-700 dark:text-golden-brown-400 font-bold text-2xl md:text-3xl mb-4 md:mb-6">₦{quickViewBook.price}</p>
+              
+              <h3 className="font-semibold text-stone-900 dark:text-stone-100 mb-1">Synopsis</h3>
+              <p className="text-sm md:text-base text-stone-700 dark:text-stone-300 mb-4 md:mb-8 leading-relaxed flex-grow">{quickViewBook.synopsis}</p>
+              
+              <button 
+                onClick={() => { addToCart(quickViewBook); setQuickViewBook(null); }}
+                disabled={addingToCart === quickViewBook.id}
+                className="w-full bg-golden-brown-700 text-white py-3 md:py-4 rounded-xl font-bold hover:bg-golden-brown-800 transition flex items-center justify-center gap-2"
+              >
+                {addingToCart === quickViewBook.id ? <Loader2 className="animate-spin" size={18} /> : <><ShoppingCart size={18}/> Add to Cart</>}
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {isCartOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex justify-end">
-          <div className="bg-white w-full max-w-md h-full p-6 flex flex-col text-black">
+          <div className="bg-white w-full max-w-md h-full p-4 sm:p-6 flex flex-col text-black">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">Your Cart</h2>
               <X className="cursor-pointer" onClick={() => setIsCartOpen(false)} />
@@ -767,11 +794,52 @@ export default function App() {
             {checkoutStep === 3 && (
               <div className="text-center space-y-4 text-black">
                 <CheckCircle className="w-16 h-16 text-golden-brown-700 mx-auto" />
-                <h3 className="text-xl font-bold">Order Confirmed!</h3>
-                <p className="text-stone-500">Thank you for your purchase.</p>
-                <button onClick={finishCheckout} className="w-full bg-golden-brown-700 text-white py-3 rounded-xl font-semibold">Finish</button>
+                <h3 className="text-xl font-bold">Confirm Order</h3>
+                <button onClick={finishCheckout} className="w-full bg-golden-brown-700 text-white py-3 rounded-xl font-semibold">Place Order</button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {confirmedOrder && (
+        <div className="fixed inset-0 bg-white z-[60] flex flex-col p-6 overflow-y-auto">
+          <div className="max-w-2xl mx-auto w-full">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-bold">Order Confirmed!</h2>
+              <button 
+                onClick={() => setConfirmedOrder(null)} 
+                className="bg-stone-100 px-6 py-3 rounded-xl font-semibold hover:bg-stone-200"
+              >
+                Close
+              </button>
+            </div>
+            
+            <div className="bg-stone-50 p-6 rounded-2xl border mb-8">
+              <div className="flex justify-between mb-4">
+                <p className="font-semibold">Order #{confirmedOrder.id}</p>
+                <p className="text-stone-500">{confirmedOrder.date}</p>
+              </div>
+              <div className="space-y-3">
+                {confirmedOrder.items.map(item => (
+                  <div key={item.id} className="flex justify-between items-center text-sm">
+                    <span>{item.title} (x{item.quantity})</span>
+                    <span>₦{item.price * item.quantity}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t mt-4 pt-4 flex justify-between font-bold text-lg">
+                <span>Total</span>
+                <span>₦{confirmedOrder.totalPrice}</span>
+              </div>
+            </div>
+            
+            <button 
+              onClick={() => setConfirmedOrder(null)} 
+              className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold hover:bg-golden-brown-800 transition"
+            >
+              Continue Shopping
+            </button>
           </div>
         </div>
       )}
@@ -790,12 +858,12 @@ export default function App() {
 
       {/* WhatsApp Customer Care Button */}
       <a 
-        href="https://wa.me/2348084012538" 
+        href="https://wa.me/2348104972574" 
         target="_blank" 
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition z-50 flex items-center justify-center"
+        className="fixed bottom-6 right-6 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition z-50 flex items-center justify-center"
       >
-        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.148-.67-1.613-.918-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.005 0C5.37 0 .002 5.368.002 12.006c0 2.092.548 4.136 1.59 5.925L0 24l6.339-1.664a11.78 11.78 0 005.666 1.443h.005c6.635 0 12.003-5.368 12.003-12.005 0-3.207-1.248-6.229-3.518-8.498"/>
         </svg>
       </a>
