@@ -244,7 +244,7 @@ export default function App() {
   ]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [activeView, setActiveView] = useState<'products' | 'orders' | 'wishlist'>('products');
+  const [activeView, setActiveView] = useState<'products' | 'orders'>('products');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -269,12 +269,8 @@ export default function App() {
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
   const [viewedBooks, setViewedBooks] = useState<number[]>([]);
   const [purchasedBooks, setPurchasedBooks] = useState<number[]>([]);
-  const [recommendations, setRecommendations] = useState<Book[]>([]);
-  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [wishlist, setWishlist] = useState<Book[]>([]);
-  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const booksPerPage = 12;
@@ -289,37 +285,21 @@ export default function App() {
 
   useEffect(() => {
     // Simulate fetching books
-    const timer = setTimeout(() => setIsLoadingBooks(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const fetchRecommendations = async () => {
-      if (viewedBooks.length === 0 && purchasedBooks.length === 0) return;
-      setIsLoadingRecommendations(true);
-
-      const viewedTitles = viewedBooks.map(id => booksState.find(b => b.id === id)?.title).filter(Boolean);
-      const purchasedTitles = purchasedBooks.map(id => booksState.find(b => b.id === id)?.title).filter(Boolean);
-
-      const prompt = `Based on the user's browsing history: ${viewedTitles.join(', ')} and purchase history: ${purchasedTitles.join(', ')}, recommend 2 books from the following list: ${booksState.map(b => b.title).join(', ')}. Return only the titles of the recommended books as a comma-separated list.`;
-
+    const fetchBooks = async () => {
       try {
-        const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
-          contents: prompt,
-        });
-        const recommendedTitles = response.text?.split(',').map(t => t.trim()) || [];
-        setRecommendations(booksState.filter(b => recommendedTitles.includes(b.title)));
-      } catch (error) {
-        console.error("Error fetching recommendations:", error);
-        setError("Failed to load recommendations. Please try again later.");
-      } finally {
-        setIsLoadingRecommendations(false);
+        setIsLoadingBooks(true);
+        // Simulate potential network error
+        if (Math.random() < 0.1) throw new Error("Failed to connect to the bookstore server. Please check your connection.");
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setIsLoadingBooks(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An unexpected error occurred while fetching books.");
+        setIsLoadingBooks(false);
       }
     };
-
-    fetchRecommendations();
-  }, [viewedBooks, purchasedBooks, booksState]);
+    fetchBooks();
+  }, []);
 
   const addReview = (bookId: number) => {
     setBooks(prev => prev.map(book => {
@@ -379,46 +359,52 @@ export default function App() {
     return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
-  const filteredBooks = booksState
-    .filter((book) => {
-      const query = searchQuery.toLowerCase();
-      // Base filtering
-      const categoryMatch = !selectedCategory || selectedCategory === 'All' || book.category === selectedCategory.toUpperCase() || book.category === toTitleCase(selectedCategory);
-      const authorMatch = !selectedAuthor || book.author === selectedAuthor;
-      const priceMatch = book.price >= priceRange[0] && book.price <= priceRange[1];
-      const year = getYear(book.publicationDate);
-      const yearMatch = year >= yearRange[0] && year <= yearRange[1];
-      const pagesMatch = book.pageCount >= pageCountRange[0] && book.pageCount <= pageCountRange[1];
-
-      // Search filtering
-      const searchMatch = !query || 
-        book.title.toLowerCase().includes(query) || 
-        book.author.toLowerCase().includes(query) ||
-        book.synopsis.toLowerCase().includes(query);
-
-      return categoryMatch && authorMatch && priceMatch && searchMatch && yearMatch && pagesMatch;
-    })
-    .sort((a, b) => {
-      if (!searchQuery) return 0;
-      const query = searchQuery.toLowerCase();
-
-      const getScore = (book: Book) => {
-        let score = 0;
-        const title = book.title.toLowerCase();
-        const author = book.author.toLowerCase();
-        const synopsis = book.synopsis.toLowerCase();
-
-        if (title === query) score += 100; // Exact title match
-        else if (title.includes(query)) score += 50; // Partial title match
+  const filteredBooks = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    
+    const allFiltered = booksState
+      .filter((book) => {
+        // Base filtering
+        const categoryMatch = !selectedCategory || selectedCategory === 'All' || book.category === selectedCategory.toUpperCase() || book.category === toTitleCase(selectedCategory);
+        const authorMatch = !selectedAuthor || book.author === selectedAuthor;
+        const priceMatch = book.price >= priceRange[0] && book.price <= priceRange[1];
+        const year = getYear(book.publicationDate);
+        const yearMatch = year >= yearRange[0] && year <= yearRange[1];
+        const pagesMatch = book.pageCount >= pageCountRange[0] && book.pageCount <= pageCountRange[1];
         
-        if (author.includes(query)) score += 30; // Partial author match
-        if (synopsis.includes(query)) score += 10; // Partial synopsis match
-        
-        return score;
-      };
+        // Search filtering
+        const searchMatch = !query || 
+          book.title.toLowerCase().includes(query) || 
+          book.author.toLowerCase().includes(query) ||
+          book.synopsis.toLowerCase().includes(query);
+          
+        return categoryMatch && authorMatch && priceMatch && searchMatch && yearMatch && pagesMatch;
+      });
 
-      return getScore(b) - getScore(a);
-    });
+    // Remove duplicates
+    const uniqueBooks = Array.from(new Map<string, Book>(allFiltered.map(book => [book.title, book])).values());
+
+    return uniqueBooks.sort((a, b) => {
+        if (!searchQuery) return 0;
+        
+        const getScore = (book: Book) => {
+          let score = 0;
+          const title = book.title.toLowerCase();
+          const author = book.author.toLowerCase();
+          const synopsis = book.synopsis.toLowerCase();
+  
+          if (title === query) score += 100; // Exact title match
+          else if (title.includes(query)) score += 50; // Partial title match
+          
+          if (author.includes(query)) score += 30; // Partial author match
+          if (synopsis.includes(query)) score += 10; // Partial synopsis match
+          
+          return score;
+        };
+  
+        return getScore(b) - getScore(a);
+      });
+    }, [booksState, searchQuery, selectedCategory, selectedAuthor, priceRange, yearRange, pageCountRange]);
 
   const categories = useMemo(() => ['All', ...new Set(booksState.map(b => toTitleCase(b.category)))], [booksState]);
 
@@ -431,13 +417,7 @@ export default function App() {
     setCheckoutStep(1);
   };
 
-  const toggleWishlist = (book: Book) => {
-    setWishlist((prev) =>
-      prev.find((item) => item.id === book.id)
-        ? prev.filter((item) => item.id !== book.id)
-        : [...prev, book]
-    );
-  };
+  const toggleWishlist = (book: Book) => {};
 
   const finishCheckout = () => {
     const newOrder: Order = {
@@ -491,16 +471,21 @@ export default function App() {
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   setIsSearching(true);
-                  setTimeout(() => setIsSearching(false), 500);
+                  setTimeout(() => setIsSearching(false), 800);
                 }}
-                className="w-32 md:w-48 pl-9 pr-4 py-1.5 rounded-full border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-golden-brown-500 bg-white text-stone-900 dark:bg-stone-800 dark:border-stone-700 dark:text-white"
+                className="w-32 md:w-48 pl-9 pr-10 py-1.5 rounded-full border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-golden-brown-500 bg-white text-stone-900 dark:bg-stone-800 dark:border-stone-700 dark:text-white"
               />
+              {isSearching ? (
+                <Loader2 className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 animate-spin" />
+              ) : (
+                <></>
+              )}
               {suggestions.length > 0 && (
                 <div className="absolute top-full left-0 mt-2 w-full md:w-64 bg-white dark:bg-stone-800 border dark:border-stone-700 rounded-lg shadow-lg z-50">
                   {suggestions.map((book) => (
                     <div
                       key={book.id}
-                      className="px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 cursor-pointer text-sm"
+                      className="px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 cursor-pointer text-sm text-stone-900 dark:text-white"
                       onClick={() => {
                         setSearchQuery(book.title);
                         setSuggestions([]);
@@ -638,11 +623,11 @@ export default function App() {
                       className="w-full p-2 mb-2 border rounded-lg"
                     />
                     <select 
-                      value={newReview.rating} 
-                      onChange={(e) => setNewReview({...newReview, rating: parseInt(e.target.value)})}
-                      className="w-full p-2 mb-2 border rounded-lg"
-                    >
-                      {[1, 2, 3, 4, 5].map(r => <option key={r} value={r}>{r} Stars</option>)}
+                        value={newReview.rating} 
+                        onChange={(e) => setNewReview({...newReview, rating: parseInt(e.target.value)})}
+                        className="w-full p-2 mb-2 border rounded-lg"
+                      >
+                        {[1, 2, 3, 4, 5].map(r => <option key={r} value={r}>{r} Stars</option>)}
                     </select>
                     <button 
                       onClick={() => addReview(selectedBook.id)}
@@ -659,82 +644,13 @@ export default function App() {
           <>
             <section className="bg-golden-brown-800 text-white rounded-3xl p-8 md:p-16 mb-12 dark:bg-golden-brown-900">
               <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-8">Read. Grow. Repeat.</h1>
-              <div className="relative">
-                <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="flex items-center justify-between w-64 bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
-                  <span>Browse Categories</span>
-                  <ChevronDown size={20} />
-                </button>
-                {isCategoriesOpen && (
-                  <div className="absolute top-full left-0 mt-2 bg-white dark:bg-stone-800 border rounded-2xl p-2 w-48 shadow-xl z-50 text-stone-900 dark:text-stone-100">
-                    {categories.map(cat => (
-                      <button key={cat} onClick={() => { setSelectedCategory(cat === 'All' ? null : cat); setActiveView('products'); setIsCategoriesOpen(false); }} className="block w-full text-left px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-lg">{cat}</button>
-                    ))}
-                  </div>
-                )}
-              </div>
             </section>
-
-            {isLoadingRecommendations ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="space-y-3">
-                    <Skeleton className="aspect-square" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                ))}
-              </div>
-            ) : recommendations.length > 0 && (
-              <section className="mb-12">
-                <h2 className="text-2xl font-bold mb-8">Recommended for You</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {recommendations.map((book) => (
-                    <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center cursor-pointer hover:shadow-lg transition-all duration-300 w-full mx-auto" onClick={() => handleBookClick(book)}>
-                      <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-32 h-48 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
-                      <h3 className="font-semibold mb-1 text-center text-sm">{book.title}</h3>
-                      <p className="text-xs text-stone-500 mb-2">{book.author}</p>
-                      <p className="text-golden-brown-700 font-bold mb-4 text-sm">₦{book.price}</p>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); toggleWishlist(book); }}
-                        className={`w-full py-1.5 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-2 ${wishlist.find(item => item.id === book.id) ? 'bg-red-100 text-red-600' : 'bg-stone-100 text-stone-900 hover:bg-stone-200'}`}
-                      >
-                        <Heart size={14} className={wishlist.find(item => item.id === book.id) ? 'fill-current' : ''} />
-                        {wishlist.find(item => item.id === book.id) ? 'Wishlisted' : 'Wishlist'}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
 
             <section>
               <h2 className="text-2xl font-bold mb-8">
                 {selectedCategory ? selectedCategory : searchQuery ? `Search Results for "${searchQuery}"` : 'All'}
               </h2>
-              {activeView === 'wishlist' ? (
-                wishlist.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {wishlist.map((book) => (
-                      <div key={book.id} className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex flex-col cursor-pointer hover:shadow-md transition" onClick={() => handleBookClick(book)}>
-                        <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="aspect-square bg-stone-100 rounded-xl mb-4 object-cover" referrerPolicy="no-referrer" />
-                        <h3 className="font-semibold mb-1">{book.title}</h3>
-                        <p className="text-sm text-stone-500 mb-2">{book.author}</p>
-                        <p className="text-golden-brown-700 font-bold mb-4">₦{book.price}</p>
-                        <div className="flex flex-col gap-2 mt-auto">
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); toggleWishlist(book); }}
-                            className="w-full bg-red-100 text-red-500 py-2 rounded-lg text-sm font-semibold hover:bg-red-200 transition"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-stone-500">Your wishlist is empty.</p>
-                )
-              ) : isSearching ? (
+              {isSearching ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[...Array(4)].map((_, i) => (
                     <div key={i} className="space-y-3">
@@ -748,7 +664,10 @@ export default function App() {
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {filteredBooks.slice((currentPage - 1) * booksPerPage, currentPage * booksPerPage).map((book) => (
-                      <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center cursor-pointer hover:shadow-lg transition-all duration-300 w-full mx-auto" onClick={() => handleBookClick(book)}>
+                      <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center cursor-pointer hover:shadow-lg transition-all duration-300 w-full mx-auto relative" onClick={() => handleBookClick(book)}>
+                        {purchasedBooks.includes(book.id) && (
+                          <div className="absolute top-4 right-4 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">Purchased</div>
+                        )}
                         <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-32 h-48 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
                         <h3 className="font-semibold mb-1 text-center text-sm">{book.title}</h3>
                         <p className="text-xs text-stone-500 mb-2">{book.author}</p>
