@@ -530,7 +530,7 @@ export default function App() {
         </nav>
         {isMobileMenuOpen && (
           <div className="md:hidden border-t p-4 bg-white dark:bg-stone-900 flex flex-col gap-2">
-            <button onClick={() => { setActiveView('orders'); setIsMobileMenuOpen(false); }} className="text-left py-2 font-semibold">Orders</button>
+            <button onClick={() => { setActiveView('orders'); setIsMobileMenuOpen(false); }} className="text-left py-2 font-semibold text-white">Orders</button>
           </div>
         )}
       </header>
@@ -709,7 +709,7 @@ export default function App() {
 
             <section>
               <h2 className="text-2xl font-bold mb-8">
-                {selectedCategory ? selectedCategory : searchQuery ? `Search Results for "${searchQuery}"` : 'Latest Products'}
+                {selectedCategory ? selectedCategory : searchQuery ? `Search Results for "${searchQuery}"` : 'All'}
               </h2>
               {activeView === 'wishlist' ? (
                 wishlist.length > 0 ? (
