@@ -473,11 +473,13 @@ export default function App() {
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
         <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setSelectedBook(null); setActiveView('products'); }}>
-            <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-24 md:h-24 object-contain" />
+          <div className="flex items-center gap-6 cursor-pointer">
+            <div onClick={() => { setSelectedBook(null); setActiveView('products'); }}>
+              <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-24 md:h-24 object-contain" />
+            </div>
+            <button onClick={() => setActiveView('orders')} className="hidden md:block text-sm font-bold text-white hover:text-golden-brown-200">Orders</button>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm font-bold dark:text-stone-300">
-            <button onClick={() => setActiveView('orders')} className="hover:text-golden-brown-700 dark:hover:text-golden-brown-400">Orders</button>
           </div>
           <div className="flex items-center gap-2 md:gap-4">
             <div className="relative">
