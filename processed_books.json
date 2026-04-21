@@ -1,0 +1,457 @@
+{
+  "books": [
+    {
+      "title": "Atomic Habits",
+      "author": "James Clear",
+      "price": "8,000.00",
+      "coverImageUrl": "https://i.imgur.com/N4VV8u1.jpeg",
+      "synopsis": "A practical guide to building good habits and breaking bad ones. Clear introduces the concept of 'atomic habits' — tiny 1% improvements that compound over time into remarkable results. Using a four-step framework (cue, craving, response, reward), he shows that the problem is never the person but the system. You don't rise to your goals; you fall to your systems.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "October 16, 2018",
+      "pages": "320"
+    },
+    {
+      "title": "Ikigai",
+      "author": "Héctor García & Francesc Miralles",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/0r9aCtb.jpeg",
+      "synopsis": "An exploration of the Japanese concept of ikigai — your reason for being, where what you love, what you're good at, what the world needs, and what you can be paid for overlap. Drawing on interviews with the world's longest-living people in Okinawa, Japan, the book reveals the secrets to a long, purposeful, and joyful life.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "September 7, 2017 (English edition)",
+      "pages": "208"
+    },
+    {
+      "title": "The Courage to Be Disliked",
+      "author": "Ichiro Kishimi & Fumitake Koga",
+      "price": "8,500.00",
+      "coverImageUrl": "https://i.imgur.com/mLsgJhC.jpeg",
+      "synopsis": "A dialogue between a philosopher and a young man that introduces the ideas of Alfred Adler, the largely overlooked founder of individual psychology. Adler argues that all problems are interpersonal relationship problems, that trauma does not exist as we commonly understand it, and that happiness is the courage to accept being disliked by others.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2013 (Japanese); May 8, 2018 (English)",
+      "pages": "288"
+    },
+    {
+      "title": "The Subtle Art of Not Giving a F*ck",
+      "author": "Mark Manson",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/dDs8OAn.jpeg",
+      "synopsis": "A counterintuitive approach to living a good life. Manson argues that the key to a better life is not caring about more things, but caring about fewer things — choosing what truly matters and letting go of everything else. The book is about values, not indifference: picking the right things to care about and then caring about them deeply.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "September 13, 2016",
+      "pages": "224"
+    },
+    {
+      "title": "Think for Yourself",
+      "author": "Thibaut Meurisse",
+      "price": "6,500.00",
+      "coverImageUrl": "",
+      "synopsis": "A practical guide to overcoming cognitive biases, avoiding deception, and developing genuine critical thinking. Meurisse argues that most people do not think — they absorb beliefs from their environment and defend them as their own. The book provides tools to question assumptions, identify propaganda, and form more accurate views of the world.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2020",
+      "pages": "154"
+    },
+    {
+      "title": "The Power of Now",
+      "author": "Eckhart Tolle",
+      "price": "7,500.00",
+      "coverImageUrl": "https://i.imgur.com/zkDK8eb.jpeg",
+      "synopsis": "A guide to spiritual enlightenment through the practice of present-moment awareness. Tolle argues that the source of most human suffering is identification with the thinking mind and its obsession with past and future. By learning to observe thoughts rather than identify with them, one discovers a state of peace and presence beneath all thought.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "1997 (first edition); 1999 (widely published)",
+      "pages": "236"
+    },
+    {
+      "title": "12 Rules for Life",
+      "author": "Jordan B. Peterson",
+      "price": "11,000.00",
+      "coverImageUrl": "https://i.imgur.com/7IKquav.jpeg",
+      "synopsis": "An antidote to chaos. Peterson draws on mythology, religion, neuroscience, and his clinical practice to offer twelve practical rules for living: from 'stand up straight with your shoulders back' to 'tell the truth — or, at least, don't lie.' A challenging exploration of responsibility, meaning, and the necessity of suffering.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "January 23, 2018",
+      "pages": "409"
+    },
+    {
+      "title": "The Four Agreements",
+      "author": "Don Miguel Ruiz",
+      "price": "7,000.00",
+      "coverImageUrl": "",
+      "synopsis": "Drawing on ancient Toltec wisdom, Ruiz identifies four self-limiting agreements people make with themselves and offers four powerful agreements to replace them: be impeccable with your word; don't take anything personally; don't make assumptions; always do your best. A short but transformative guide to personal freedom.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "November 7, 1997",
+      "pages": "160"
+    },
+    {
+      "title": "Can't Hurt Me",
+      "author": "David Goggins",
+      "price": "9,500.00",
+      "coverImageUrl": "https://i.imgur.com/92seEti.jpeg",
+      "synopsis": "The extraordinary memoir of David Goggins — the only man to complete Navy SEAL training, Army Ranger School, and Air Force Tactical Air Controller training. Growing up in abject poverty with an abusive father, Goggins overcame obesity, racism, and self-doubt to become one of the world's greatest endurance athletes and the 'hardest man alive.'",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "December 4, 2018",
+      "pages": "364"
+    },
+    {
+      "title": "Nonviolent Communication",
+      "author": "Marshall B. Rosenberg",
+      "price": "",
+      "coverImageUrl": "",
+      "synopsis": "A communication process that helps people exchange information compassionately and effectively. Rosenberg introduces NVC — a four-step framework of observation, feelings, needs, and requests — that transforms how we speak and listen, enabling deeper connection and the peaceful resolution of conflict.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "1999 (first edition)",
+      "pages": "220"
+    },
+    {
+      "title": "Set Boundaries, Find Peace",
+      "author": "Nedra Glennon Tawwab",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/U6VGTuU.jpeg",
+      "synopsis": "A practical guide to setting healthy boundaries in every area of life — work, family, romantic relationships, and friendships. Tawwab, a therapist, argues that most anxiety, resentment, burnout, and unhappiness stem from a lack of clear boundaries, and shows readers how to identify, communicate, and maintain them.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "March 16, 2021",
+      "pages": "272"
+    },
+    {
+      "title": "Eat That Frog!",
+      "author": "Brian Tracy",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/odih83L.jpeg",
+      "synopsis": "Based on the Mark Twain quote that if you eat a live frog first thing in the morning, nothing worse will happen to you all day, Tracy presents 21 techniques to stop procrastinating and get more done in less time. The 'frog' is your most important, most challenging task — the one you're most likely to avoid.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "January 1, 2001",
+      "pages": "128"
+    },
+    {
+      "title": "Think and Grow Rich",
+      "author": "Napoleon Hill",
+      "price": "7,500.00",
+      "coverImageUrl": "https://i.imgur.com/ulvXa0c.jpeg",
+      "synopsis": "One of the best-selling self-help books of all time. Based on Hill's study of over 500 successful people including Andrew Carnegie, Henry Ford, and Thomas Edison, the book outlines 13 principles for accumulating wealth — from desire and faith to specialised knowledge, imagination, and the mastermind alliance.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "1937",
+      "pages": "233"
+    },
+    {
+      "title": "Hidden Potential",
+      "author": "Adam Grant",
+      "price": "5,000.00",
+      "coverImageUrl": "https://i.imgur.com/Mw0qcZ9.jpeg",
+      "synopsis": "A challenge to the notion that talent is fixed. Grant argues that the greatest untapped source of human potential is not prodigies who start with natural ability but ordinary people who put in the work to develop extraordinary skills. A science-backed exploration of how to grow beyond your starting point.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "October 3, 2023",
+      "pages": "288"
+    },
+    {
+      "title": "The School of Life",
+      "author": "Alain de Botton & The School of Life",
+      "price": "7,500.00",
+      "coverImageUrl": "https://i.imgur.com/i4Cbd5w.jpeg",
+      "synopsis": "An emotional education — exploring what it means to be a good person, to have a good relationship, a fulfilling career, and a properly examined inner life. Drawing on philosophy, psychology, and literature, the book addresses the questions that matter most but are rarely discussed seriously.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2019",
+      "pages": "456"
+    },
+    {
+      "title": "The Power of Your Subconscious Mind",
+      "author": "Joseph Murphy",
+      "price": "8,500.00",
+      "coverImageUrl": "https://i.imgur.com/8OlmcHO.jpeg",
+      "synopsis": "A classic self-help text arguing that the subconscious mind is a powerful force that can be harnessed through positive thinking, visualisation, and affirmation. Murphy draws on religious and psychological principles to show how directing the subconscious can improve health, relationships, wealth, and happiness.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "1963",
+      "pages": "320"
+    },
+    {
+      "title": "Think Again",
+      "author": "Adam Grant",
+      "price": "8,000.00",
+      "coverImageUrl": "https://i.imgur.com/svyEX3c.jpeg",
+      "synopsis": "A manifesto for the value of rethinking and unlearning. Grant argues that intelligence is not just about knowing — it's about knowing what you don't know, questioning your assumptions, and being willing to change your mind. In a world of increasing certainty, the ability to think again is the most undervalued skill.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "February 2, 2021",
+      "pages": "307"
+    },
+    {
+      "title": "The 7 Habits of Highly Effective People",
+      "author": "Stephen R. Covey",
+      "price": "7,500.00",
+      "coverImageUrl": "https://i.imgur.com/JwTajMO.jpeg",
+      "synopsis": "One of the most influential business books ever written. Covey presents seven habits that align character and competence: be proactive; begin with the end in mind; put first things first; think win-win; seek first to understand; synergise; and sharpen the saw. A principle-centred approach to personal and professional effectiveness.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "August 15, 1989",
+      "pages": "381"
+    },
+    {
+      "title": "Master Your Emotions",
+      "author": "Thibaut Meurisse",
+      "price": "7,500.00",
+      "coverImageUrl": "https://i.imgur.com/nAjYaHK.jpeg",
+      "synopsis": "A practical guide to taking control of your emotions rather than being controlled by them. Meurisse explains how emotions are created, why they become destructive, and the specific techniques — from reframing to acceptance — that build emotional resilience and inner stability.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2019",
+      "pages": "166"
+    },
+    {
+      "title": "Stillness Is the Key",
+      "author": "Ryan Holiday",
+      "price": "7,000.00",
+      "coverImageUrl": "https://i.imgur.com/GcpzxVd.jpeg",
+      "synopsis": "Drawing on Stoic, Buddhist, and other philosophical traditions, Holiday argues that inner stillness — the ability to slow down, be present, and find calm amidst chaos — is the secret weapon of the greatest leaders, athletes, artists, and thinkers in history. The third book in his Stoic philosophy series.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "October 1, 2019",
+      "pages": "288"
+    },
+    {
+      "title": "The Let Them Theory",
+      "author": "Mel Robbins",
+      "price": "8,500.00",
+      "coverImageUrl": "https://i.imgur.com/oDugCZZ.jpeg",
+      "synopsis": "A simple but transformative mindset shift: let people do what they want, say what they want, think what they want — and stop trying to control them. Robbins argues that the two most liberating words in personal development are 'let them,' and that accepting others' choices is the key to your own freedom and peace.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "February 18, 2025",
+      "pages": "320"
+    },
+    {
+      "title": "Don't Believe Everything You Think",
+      "author": "Joseph Nguyen",
+      "price": "6,000.00",
+      "coverImageUrl": "https://i.imgur.com/tg6S7FC.jpeg",
+      "synopsis": "An exploration of why the root of all psychological suffering is thinking — specifically, our habit of believing every thought that passes through our mind. Nguyen argues that freedom comes not from positive thinking but from no longer identifying with thought itself, drawing on principles of non-duality and mindfulness.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "December 20, 2022",
+      "pages": "168"
+    },
+    {
+      "title": "This Is Why We Dream",
+      "author": "Rahul Jandial",
+      "price": "",
+      "coverImageUrl": "https://i.imgur.com/CeE0iFT.jpeg",
+      "synopsis": "A neurosurgeon's exploration of the science and meaning of dreams. Dr. Jandial combines cutting-edge brain science with real patient experiences to explain what dreams are, why we have them, what they reveal about our brains and emotions, and how we can use them to enhance creativity, process trauma, and live better lives.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "February 6, 2024",
+      "pages": "288"
+    },
+    {
+      "title": "Never Finished",
+      "author": "David Goggins",
+      "price": "7,000.00",
+      "coverImageUrl": "https://i.imgur.com/ipShLC7.jpeg",
+      "synopsis": "The follow-up to Can't Hurt Me. Goggins goes deeper into the mental tools that helped him survive and thrive: the 40% rule, the cookie jar method, and the ability to evolve far beyond what most people think is possible. A sequel that is rawer and more philosophically demanding than its predecessor.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "December 6, 2022",
+      "pages": "336"
+    },
+    {
+      "title": "Tuesdays with Morrie",
+      "author": "Mitch Albom",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/XCGf90f.jpeg",
+      "synopsis": "The true story of sportswriter Mitch Albom, who reconnects with his beloved college professor Morrie Schwartz as Morrie is dying from ALS. Every Tuesday, they discuss life's greatest questions — love, work, community, family, aging, forgiveness, and death. A small book that contains enormous wisdom.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "August 18, 1997",
+      "pages": "192"
+    },
+    {
+      "title": "The Obstacle Is the Way",
+      "author": "Ryan Holiday",
+      "price": "7,500.00",
+      "coverImageUrl": "https://i.imgur.com/YJ7toFO.jpeg",
+      "synopsis": "Drawing on the Stoic philosophy of Marcus Aurelius, Holiday argues that obstacles are not problems to be solved but opportunities to be embraced. Through historical examples from Marcus Aurelius to Amelia Earhart to Steve Jobs, he demonstrates that the impediment to action advances action — what stands in the way becomes the way.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "May 1, 2014",
+      "pages": "224"
+    },
+    {
+      "title": "The 5AM Club",
+      "author": "Robin Sharma",
+      "price": "8,500.00",
+      "coverImageUrl": "https://i.imgur.com/NfAJ4em.jpeg",
+      "synopsis": "A story about two strangers who meet a quirky billionaire who teaches them the 20/20/20 formula: spend the first 20 minutes of the morning exercising, the next 20 reflecting and planning, and the last 20 learning. Sharma argues that owning your morning is the foundation of an extraordinary life.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "December 4, 2018",
+      "pages": "352"
+    },
+    {
+      "title": "Clear Thinking",
+      "author": "Shane Parrish",
+      "price": "8,500.00",
+      "coverImageUrl": "https://i.imgur.com/zJj8o9r.jpeg",
+      "synopsis": "A framework for making better decisions in the moments that matter most. Parrish argues that most bad outcomes result not from insufficient information but from failing to think clearly in high-stakes situations. He presents four key defaults that undermine clear thinking and the principles that overcome them.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "October 3, 2023",
+      "pages": "272"
+    },
+    {
+      "title": "Unfu*k Yourself",
+      "author": "Gary John Bishop",
+      "price": "7,500.00",
+      "coverImageUrl": "https://i.imgur.com/BXjBuBe.jpeg",
+      "synopsis": "A no-nonsense guide to getting out of your own way. Bishop argues that the source of most failure is the stories people tell themselves — and that by changing the assertions you make about yourself, you change your reality. Written in the voice of a Scottish life coach who doesn't tolerate self-pity.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "January 31, 2017 (self-published); August 14, 2018 (HarperCollins)",
+      "pages": "176"
+    },
+    {
+      "title": "Hyperfocus",
+      "author": "Chris Bailey",
+      "price": "7,500.00",
+      "coverImageUrl": "https://i.imgur.com/IvxIx6w.jpeg",
+      "synopsis": "A counterintuitive guide to productivity that argues we need two modes of thinking: hyperfocus (deep, intentional concentration on one task) and scatterfocus (deliberately letting the mind wander to enable creativity and problem-solving). Bailey shows how to toggle between these modes to become exponentially more effective.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "September 4, 2018",
+      "pages": "256"
+    },
+    {
+      "title": "Dopamine Detox",
+      "author": "Thibaut Meurisse",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/uiUhNhP.jpeg",
+      "synopsis": "A guide to reclaiming control of your attention in an age of addictive technology. Meurisse explains how constant stimulation from social media, entertainment, and notifications depletes motivation and focus, and provides a practical protocol for resetting your dopamine system to restore drive and clarity.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2020",
+      "pages": "132"
+    },
+    {
+      "title": "Who Moved My Cheese?",
+      "author": "Spencer Johnson",
+      "price": "5,500.00",
+      "coverImageUrl": "https://i.imgur.com/YWDFZOp.jpeg",
+      "synopsis": "A parable about two mice and two tiny humans who live in a maze and depend on cheese for their happiness. When the cheese moves, their responses reveal everything about how people deal with change. A deceptively simple story with a profound message about adaptability and letting go.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "September 8, 1998",
+      "pages": "96"
+    },
+    {
+      "title": "How to Get from Where You Are to Where You Want to Be",
+      "author": "Jack Canfield",
+      "price": "8,500.00",
+      "coverImageUrl": "https://i.imgur.com/wkoWbKH.jpeg",
+      "synopsis": "Known as The Success Principles, this book presents 64 timeless principles used by successful men and women throughout history. Canfield distils decades of research and experience into practical strategies for taking 100% responsibility for your life and achieving any goal you set.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2005",
+      "pages": "512"
+    },
+    {
+      "title": "Single on Purpose",
+      "author": "John Kim",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/ThAhtXW.jpeg",
+      "synopsis": "A guide to using the single life as an opportunity for radical self-discovery and growth rather than a period of waiting for love. Kim challenges readers to build a rich relationship with themselves — to find purpose, heal old wounds, and develop a strong sense of self — before seeking it from a partner.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "March 16, 2021",
+      "pages": "256"
+    },
+    {
+      "title": "The Power of Self-Discipline",
+      "author": "Brian Tracy",
+      "price": "7,000.00",
+      "coverImageUrl": "",
+      "synopsis": "A guide to building the self-discipline that separates the extraordinary from the ordinary. Walter examines the psychology of discipline, explains why willpower fails, and presents practical strategies for building daily habits that compound into lasting achievement.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2020",
+      "pages": "188"
+    },
+    {
+      "title": "Good Vibes, Good Life",
+      "author": "Vex King",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/MJSUhc6.jpeg",
+      "synopsis": "A guide to raising your vibration and transforming your life through self-love. King shares his own story of growing up in poverty and overcoming adversity, and presents principles of mindfulness, gratitude, and positive thinking that he credits with his personal transformation.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "April 2, 2019",
+      "pages": "272"
+    },
+    {
+      "title": "The Wealth Money Can't Buy",
+      "author": "Robin Sharma",
+      "price": "7,500.00",
+      "coverImageUrl": "https://i.imgur.com/M4MnoF8.jpeg",
+      "synopsis": "Sharma's exploration of the eight forms of wealth beyond money — growth, wellness, family, craft, community, adventure, service, and soulfulness. He argues that true richness means thriving in all eight areas, and provides a framework for building a life of genuine abundance.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "January 30, 2024",
+      "pages": "288"
+    },
+    {
+      "title": "As a Man Thinketh",
+      "author": "James Allen",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/u5jt1PP.jpeg",
+      "synopsis": "A slim but profound essay on the power of thought. Allen argues that a person is literally what they think — that character, circumstance, health, and achievement are all direct products of habitual thinking. One of the earliest and most influential self-help texts ever written",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "1903",
+      "pages": "52"
+    },
+    {
+      "title": "The Almanack of Naval Ravikant",
+      "author": "Eric Jorgenson",
+      "price": "8,500.00",
+      "coverImageUrl": "https://i.imgur.com/lLlaffU.jpeg",
+      "synopsis": "A curated collection of Naval Ravikant's wisdom on wealth and happiness, assembled from his tweets, podcasts, and essays. Covers how to think about wealth creation, leverage, specific knowledge, and the foundations of a happy life — all distilled from one of Silicon Valley's most respected thinkers.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2020",
+      "pages": "242"
+    },
+    {
+      "title": "The Daily Stoic",
+      "author": "Ryan Holiday/Stephen Hanselman",
+      "price": "10,000.00",
+      "coverImageUrl": "https://i.imgur.com/h5LsiFs.jpeg",
+      "synopsis": "A structured daily guide to Stoic philosophy, offering 366 short readings—one for each day of the year. Each entry presents timeless teachings from Stoic philosophers like Marcus Aurelius, Seneca, and Epictetus, paired with modern reflections to help readers build resilience, discipline, and emotional control.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2016",
+      "pages": "416"
+    },
+    {
+      "title": "Ego is the Enemy",
+      "author": "Ryan Holiday",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/qDDg9Du.jpeg",
+      "synopsis": "This book explores how ego—our inflated sense of self-importance—becomes a major obstacle to success, learning, and fulfillment. Using historical figures, athletes, and leaders, it shows how ego can sabotage ambition and how humility and discipline create lasting achievement.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2016",
+      "pages": "226"
+    },
+    {
+      "title": "The Art of Laziness",
+      "author": "Library Mindset",
+      "price": "5,500.00",
+      "coverImageUrl": "https://i.imgur.com/Q0qZN5H.jpeg",
+      "synopsis": "A modern productivity guide that challenges traditional ideas of hustle culture. It focuses on overcoming procrastination, building efficient habits, and achieving goals with less stress by working smarter rather than harder.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2021",
+      "pages": "170"
+    },
+    {
+      "title": "Don't Leave Anything for Later",
+      "author": "Library Mindset",
+      "price": "5,500.00",
+      "coverImageUrl": "https://i.imgur.com/oEVfB1A.jpeg",
+      "synopsis": "A motivational productivity-focused book aimed at helping readers eliminate procrastination and take immediate action toward their goals. It emphasizes discipline, urgency, and breaking the habit of delaying important tasks.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2025",
+      "pages": "150"
+    },
+    {
+      "title": "You're a Badass",
+      "author": "Jen Sincero",
+      "price": "6,500.00",
+      "coverImageUrl": "https://i.imgur.com/VEjVvNN.jpeg",
+      "synopsis": "A motivational self-help book that encourages readers to stop self-doubt, reframe limiting beliefs, and take control of their lives. It blends humor, personal stories, and practical advice to help readers build confidence and pursue their goals boldly.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2013",
+      "pages": "256"
+    },
+    {
+      "title": "How to Finish Everything You Start",
+      "author": "Jan Yager",
+      "price": "7,000.00",
+      "coverImageUrl": "https://i.imgur.com/VaV0Oup.jpeg",
+      "synopsis": "A productivity guide that explains why people struggle to complete tasks and offers practical methods to improve focus, avoid procrastination, and finish what they begin. It introduces a structured approach to help readers prioritize better and follow through consistently.",
+      "category": "PERSONAL DEVELOPMENT",
+      "published": "2019",
+      "pages": "240"
+    }
+  ],
+  "categories": [
+    "PERSONAL DEVELOPMENT"
+  ]
+}
