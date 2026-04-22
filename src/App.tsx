@@ -722,40 +722,40 @@ export default function App() {
       </main>
 
       {quickViewBook && (
-        <div className="absolute top-20 left-0 w-full z-50 flex justify-center p-4">
-          <div className="bg-white dark:bg-stone-900 w-full max-w-md rounded-3xl p-4 md:p-6 relative border border-stone-200 dark:border-stone-700 shadow-2xl flex flex-col md:flex-row gap-4 md:gap-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setQuickViewBook(null)} />
+          <div className="bg-white dark:bg-stone-900 w-full max-w-sm rounded-2xl p-4 relative border border-stone-100 dark:border-stone-800 shadow-xl flex flex-col gap-3 z-10">
             <button 
               onClick={() => setQuickViewBook(null)}
-              className="absolute -top-3 -right-3 p-2 bg-stone-900 text-white hover:bg-stone-700 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-stone-300 rounded-full shadow-xl transition z-10"
+              className="absolute top-2 right-2 p-1.5 bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-full transition z-20"
             >
-              <X size={20} />
+              <X size={16} />
             </button>
-            <div className="w-full md:w-1/3 shrink-0">
-              <img src={quickViewBook.coverImageUrl || 'https://placehold.co/400x600?text=Book+Cover'} alt={quickViewBook.title} className="w-full aspect-[2/3] rounded-2xl object-cover shadow-md" referrerPolicy="no-referrer" />
-            </div>
-            <div className="w-full md:w-2/3 flex flex-col">
-              <h2 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-stone-900 dark:text-stone-100">{quickViewBook.title}</h2>
-              <p className="text-base md:text-lg text-stone-600 dark:text-stone-400 mb-3 md:mb-4">{quickViewBook.author}</p>
-              
-              <div className="flex gap-2 md:gap-4 text-xs md:text-sm text-stone-500 dark:text-stone-400 mb-4 md:mb-6 font-mono border-y py-2 md:py-3 border-stone-100 dark:border-stone-800">
-                <p>Published: {quickViewBook.publicationDate}</p>
-                <p>•</p>
-                <p>{quickViewBook.pageCount} pages</p>
+            <div className="flex gap-3">
+              <div className="w-20 shrink-0">
+                <img src={quickViewBook.coverImageUrl || 'https://placehold.co/400x600?text=Book+Cover'} alt={quickViewBook.title} className="w-full aspect-[2/3] rounded-lg object-cover shadow-sm" referrerPolicy="no-referrer" />
               </div>
-              
-              <p className="text-golden-brown-700 dark:text-golden-brown-400 font-bold text-2xl md:text-3xl mb-4 md:mb-6">₦{quickViewBook.price}</p>
-              
-              <h3 className="font-semibold text-stone-900 dark:text-stone-100 mb-1">Synopsis</h3>
-              <p className="text-sm md:text-base text-stone-700 dark:text-stone-300 mb-4 md:mb-8 leading-relaxed flex-grow">{quickViewBook.synopsis}</p>
-              
-              <button 
-                onClick={() => { addToCart(quickViewBook); setQuickViewBook(null); }}
-                disabled={addingToCart === quickViewBook.id}
-                className="w-full bg-golden-brown-700 text-white py-3 md:py-4 rounded-xl font-bold hover:bg-golden-brown-800 transition flex items-center justify-center gap-2"
-              >
-                {addingToCart === quickViewBook.id ? <Loader2 className="animate-spin" size={18} /> : <><ShoppingCart size={18}/> Add to Cart</>}
-              </button>
+              <div className="flex flex-col justify-center">
+                <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100 leading-tight mb-0.5">{quickViewBook.title}</h2>
+                <p className="text-sm text-stone-600 dark:text-stone-400 mb-1">{quickViewBook.author}</p>
+                <div className="flex gap-2 text-[10px] text-stone-500 dark:text-stone-400 font-mono mb-1">
+                  <span>{quickViewBook.publicationDate}</span>
+                  <span>•</span>
+                  <span>{quickViewBook.pageCount} pages</span>
+                </div>
+                <p className="text-golden-brown-700 dark:text-golden-brown-400 font-bold text-lg">₦{quickViewBook.price.toLocaleString()}</p>
+              </div>
             </div>
+            
+            <p className="text-xs text-stone-600 dark:text-stone-400 line-clamp-3 leading-relaxed">{quickViewBook.synopsis}</p>
+            
+            <button 
+              onClick={() => { addToCart(quickViewBook); setQuickViewBook(null); }}
+              disabled={addingToCart === quickViewBook.id}
+              className="w-full bg-golden-brown-700 text-white py-2 rounded-lg font-semibold hover:bg-golden-brown-800 transition flex items-center justify-center gap-1.5 text-sm"
+            >
+              {addingToCart === quickViewBook.id ? <Loader2 className="animate-spin" size={16} /> : <><ShoppingCart size={16}/> Add to Cart</>}
+            </button>
           </div>
         </div>
       )}
