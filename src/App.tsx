@@ -436,7 +436,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen font-sans ${theme === 'dark' ? 'bg-stone-900 text-white' : 'bg-stone-950 text-white'}`}>
+    <div className={`min-h-screen font-sans ${theme === 'dark' ? 'bg-stone-900 text-stone-100' : 'bg-stone-50 text-stone-900'}`}>
       {error && (
         <div className="fixed top-20 left-0 w-full p-4 z-50">
           <div className="bg-red-100 text-red-700 p-4 rounded-xl shadow-lg flex justify-between items-center">
@@ -451,7 +451,7 @@ export default function App() {
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
         <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-6 cursor-pointer">
-            <div onClick={() => { setSelectedBook(null); setActiveView('products'); }}>
+            <div onClick={() => { setSelectedBook(null); setActiveView('products'); setSelectedCategory(null); }}>
               <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-24 md:h-24 object-contain" />
             </div>
             <button onClick={() => setActiveView('orders')} className="hidden md:block text-sm font-bold text-white hover:text-golden-brown-200">Orders</button>
@@ -460,7 +460,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2 md:gap-4">
             <div className="relative">
-              <Search className="w-5 h-5 absolute left-2 top-1/2 -translate-y-1/2 text-stone-200" />
+              <Search className="w-5 h-5 absolute left-2 top-1/2 -translate-y-1/2 text-white" />
               <input
                 type="text"
                 placeholder="Search..."
@@ -470,14 +470,14 @@ export default function App() {
                   setIsSearching(true);
                   setTimeout(() => setIsSearching(false), 500);
                 }}
-                className="w-32 md:w-48 pl-9 pr-4 py-1.5 rounded-full border border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-golden-brown-500 bg-stone-900 text-white"
+                className="w-32 md:w-48 pl-9 pr-4 py-1.5 rounded-full border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-golden-brown-500 bg-transparent text-white placeholder-white"
               />
               {suggestions.length > 0 && (
-                <div className="absolute top-full left-0 mt-2 w-full md:w-64 bg-white dark:bg-stone-800 border dark:border-stone-700 rounded-lg shadow-lg z-50">
+                <div className="absolute top-full left-0 mt-2 w-full md:w-64 bg-stone-900 border border-stone-700 rounded-lg shadow-lg z-50">
                   {suggestions.map((book) => (
                     <div
                       key={book.id}
-                      className="px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 cursor-pointer text-sm"
+                      className="px-4 py-2 hover:bg-stone-800 cursor-pointer text-sm text-white"
                       onClick={() => {
                         setSearchQuery(book.title);
                         setSuggestions([]);
@@ -523,16 +523,16 @@ export default function App() {
         )}
         {activeView === 'orders' ? (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white">Order History</h2>
+            <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">Order History</h2>
             {orders.length === 0 ? (
-              <p className="text-stone-200">No orders found.</p>
+              <p className="text-stone-500">No orders found.</p>
             ) : (
               <div className="space-y-4">
                 {orders.map(order => (
                   <div key={order.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
                     <div className="flex justify-between mb-4">
                       <p className="font-semibold">Order #{order.id}</p>
-                      <p className="text-stone-200">{order.date}</p>
+                      <p className="text-stone-500">{order.date}</p>
                     </div>
                     <div className="space-y-2">
                       {order.items.map(item => (
@@ -563,16 +563,16 @@ export default function App() {
           </div>
         ) : selectedBook ? (
           <div className="space-y-8">
-            <button onClick={() => setSelectedBook(null)} className="flex items-center gap-2 text-stone-300 hover:text-golden-brown-400">
+            <button onClick={() => setSelectedBook(null)} className="flex items-center gap-2 text-stone-500 hover:text-golden-brown-700">
               <ArrowLeft size={20} /> Back to Products
             </button>
             <div className="grid md:grid-cols-2 gap-12">
               <img src={selectedBook.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={selectedBook.title} className="w-full aspect-[3/4] bg-stone-100 rounded-3xl object-cover" referrerPolicy="no-referrer" />
               <div className="space-y-6">
                 <h1 className="text-4xl font-bold">{selectedBook.title}</h1>
-                <p className="text-xl text-stone-300">{selectedBook.author}</p>
+                <p className="text-xl text-stone-600">{selectedBook.author}</p>
                 <p className="text-2xl font-bold text-golden-brown-700">₦{selectedBook.price}</p>
-                <p className="text-stone-200">{selectedBook.synopsis}</p>
+                <p className="text-stone-700">{selectedBook.synopsis}</p>
                 <button 
                   onClick={() => addToCart(selectedBook)}
                   disabled={addingToCart === selectedBook.id}
@@ -582,7 +582,7 @@ export default function App() {
                 </button>
                 <div className="border-t pt-6">
                   <h3 className="font-bold mb-2">Author Bio</h3>
-                  <p className="text-stone-300">{selectedBook.authorBio}</p>
+                  <p className="text-stone-600">{selectedBook.authorBio}</p>
                 </div>
                 <div className="border-t pt-6">
                   <h3 className="font-bold mb-2">Customer Reviews</h3>
@@ -672,9 +672,9 @@ export default function App() {
                     {filteredBooks.slice((currentPage - 1) * booksPerPage, currentPage * booksPerPage).map((book) => (
                       <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center cursor-pointer hover:shadow-lg transition-all duration-300 w-full mx-auto" onClick={() => handleBookClick(book)}>
                         <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-32 h-48 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
-                        <h3 className="font-semibold mb-1 text-center text-sm">{book.title}</h3>
+                        <h3 className="font-semibold mb-1 text-center text-sm w-full truncate">{book.title}</h3>
                         <p className="text-xs text-stone-500 mb-2">{book.author}</p>
-                        <p className="text-golden-brown-700 font-bold mb-4 text-sm">₦{book.price}</p>
+                        <p className="text-golden-brown-700 font-bold mb-4 text-sm">₦{book.price.toLocaleString()}</p>
                         <div className="flex flex-col gap-2 mt-auto w-full">
                           <button 
                             onClick={(e) => { e.stopPropagation(); setQuickViewBook(book); }}
@@ -722,37 +722,36 @@ export default function App() {
       </main>
 
       {quickViewBook && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm" onClick={() => setQuickViewBook(null)}></div>
-          <div className="bg-stone-900 w-full max-w-2xl rounded-3xl p-6 md:p-8 relative border border-stone-800 shadow-2xl flex flex-col md:flex-row gap-8">
+        <div className="absolute top-20 left-0 w-full z-50 flex justify-center p-4">
+          <div className="bg-white dark:bg-stone-900 w-full max-w-md rounded-3xl p-4 md:p-6 relative border border-stone-200 dark:border-stone-700 shadow-2xl flex flex-col md:flex-row gap-4 md:gap-6">
             <button 
               onClick={() => setQuickViewBook(null)}
-              className="absolute -top-3 -right-3 p-3 bg-stone-800 text-white hover:bg-stone-700 rounded-full shadow-xl transition z-10"
+              className="absolute -top-3 -right-3 p-2 bg-stone-900 text-white hover:bg-stone-700 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-stone-300 rounded-full shadow-xl transition z-10"
             >
               <X size={20} />
             </button>
             <div className="w-full md:w-1/3 shrink-0">
-              <img src={quickViewBook.coverImageUrl || 'https://placehold.co/400x600?text=Book+Cover'} alt={quickViewBook.title} className="w-full aspect-[2/3] rounded-2xl object-cover shadow-lg" referrerPolicy="no-referrer" />
+              <img src={quickViewBook.coverImageUrl || 'https://placehold.co/400x600?text=Book+Cover'} alt={quickViewBook.title} className="w-full aspect-[2/3] rounded-2xl object-cover shadow-md" referrerPolicy="no-referrer" />
             </div>
             <div className="w-full md:w-2/3 flex flex-col">
-              <h2 className="text-3xl md:text-4xl font-bold mb-2 text-white">{quickViewBook.title}</h2>
-              <p className="text-lg md:text-xl text-stone-300 mb-4">{quickViewBook.author}</p>
+              <h2 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-stone-900 dark:text-stone-100">{quickViewBook.title}</h2>
+              <p className="text-base md:text-lg text-stone-600 dark:text-stone-400 mb-3 md:mb-4">{quickViewBook.author}</p>
               
-              <div className="flex gap-4 text-sm text-stone-400 mb-6 font-mono border-y border-stone-800 py-3">
+              <div className="flex gap-2 md:gap-4 text-xs md:text-sm text-stone-500 dark:text-stone-400 mb-4 md:mb-6 font-mono border-y py-2 md:py-3 border-stone-100 dark:border-stone-800">
                 <p>Published: {quickViewBook.publicationDate}</p>
                 <p>•</p>
                 <p>{quickViewBook.pageCount} pages</p>
               </div>
               
-              <p className="text-golden-brown-400 font-bold text-3xl mb-6">₦{quickViewBook.price}</p>
+              <p className="text-golden-brown-700 dark:text-golden-brown-400 font-bold text-2xl md:text-3xl mb-4 md:mb-6">₦{quickViewBook.price}</p>
               
-              <h3 className="font-semibold text-white mb-2">Synopsis</h3>
-              <p className="text-stone-300 mb-8 leading-relaxed flex-grow">{quickViewBook.synopsis}</p>
+              <h3 className="font-semibold text-stone-900 dark:text-stone-100 mb-1">Synopsis</h3>
+              <p className="text-sm md:text-base text-stone-700 dark:text-stone-300 mb-4 md:mb-8 leading-relaxed flex-grow">{quickViewBook.synopsis}</p>
               
               <button 
                 onClick={() => { addToCart(quickViewBook); setQuickViewBook(null); }}
                 disabled={addingToCart === quickViewBook.id}
-                className="w-full bg-golden-brown-700 text-white py-4 rounded-xl font-bold hover:bg-golden-brown-600 transition flex items-center justify-center gap-2"
+                className="w-full bg-golden-brown-700 text-white py-3 md:py-4 rounded-xl font-bold hover:bg-golden-brown-800 transition flex items-center justify-center gap-2"
               >
                 {addingToCart === quickViewBook.id ? <Loader2 className="animate-spin" size={18} /> : <><ShoppingCart size={18}/> Add to Cart</>}
               </button>
