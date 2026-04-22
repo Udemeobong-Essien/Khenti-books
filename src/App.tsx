@@ -267,10 +267,9 @@ export default function App() {
   const [isLoadingBooks, setIsLoadingBooks] = useState(true);
   const [addingToCart, setAddingToCart] = useState<number | null>(null);
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
-  const [viewedBooks, setViewedBooks] = useState<number[]>([]);
-  const [purchasedBooks, setPurchasedBooks] = useState<number[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const booksPerPage = 12;
@@ -285,20 +284,8 @@ export default function App() {
 
   useEffect(() => {
     // Simulate fetching books
-    const fetchBooks = async () => {
-      try {
-        setIsLoadingBooks(true);
-        // Simulate potential network error
-        if (Math.random() < 0.1) throw new Error("Failed to connect to the bookstore server. Please check your connection.");
-        
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setIsLoadingBooks(false);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An unexpected error occurred while fetching books.");
-        setIsLoadingBooks(false);
-      }
-    };
-    fetchBooks();
+    const timer = setTimeout(() => setIsLoadingBooks(false), 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   const addReview = (bookId: number) => {
@@ -360,10 +347,12 @@ export default function App() {
   };
 
   const filteredBooks = useMemo(() => {
-    const query = searchQuery.toLowerCase();
+    const uniqueBooks = new Map<number, Book>();
+    booksState.forEach(book => uniqueBooks.set(book.id, book));
     
-    const allFiltered = booksState
+    const sortedBooks = Array.from(uniqueBooks.values())
       .filter((book) => {
+        const query = searchQuery.toLowerCase();
         // Base filtering
         const categoryMatch = !selectedCategory || selectedCategory === 'All' || book.category === selectedCategory.toUpperCase() || book.category === toTitleCase(selectedCategory);
         const authorMatch = !selectedAuthor || book.author === selectedAuthor;
@@ -371,22 +360,19 @@ export default function App() {
         const year = getYear(book.publicationDate);
         const yearMatch = year >= yearRange[0] && year <= yearRange[1];
         const pagesMatch = book.pageCount >= pageCountRange[0] && book.pageCount <= pageCountRange[1];
-        
+  
         // Search filtering
         const searchMatch = !query || 
           book.title.toLowerCase().includes(query) || 
           book.author.toLowerCase().includes(query) ||
           book.synopsis.toLowerCase().includes(query);
-          
+  
         return categoryMatch && authorMatch && priceMatch && searchMatch && yearMatch && pagesMatch;
-      });
-
-    // Remove duplicates
-    const uniqueBooks = Array.from(new Map<string, Book>(allFiltered.map(book => [book.title, book])).values());
-
-    return uniqueBooks.sort((a, b) => {
+      })
+      .sort((a, b) => {
         if (!searchQuery) return 0;
-        
+        const query = searchQuery.toLowerCase();
+  
         const getScore = (book: Book) => {
           let score = 0;
           const title = book.title.toLowerCase();
@@ -404,7 +390,22 @@ export default function App() {
   
         return getScore(b) - getScore(a);
       });
-    }, [booksState, searchQuery, selectedCategory, selectedAuthor, priceRange, yearRange, pageCountRange]);
+    
+    if (searchQuery.trim() !== '' && sortedBooks.length > 0) {
+        // Group by title and take the first one
+        const uniqueByTitle = new Map<string, Book>();
+        sortedBooks.forEach(book => {
+            if (!uniqueByTitle.has(book.title)) {
+                uniqueByTitle.set(book.title, book);
+            }
+        });
+        const uniqueList = Array.from(uniqueByTitle.values());
+        // Still return only one result
+        return [uniqueList[0]];
+    }
+
+    return sortedBooks;
+  }, [booksState, searchQuery, selectedCategory, selectedAuthor, priceRange, yearRange, pageCountRange]);
 
   const categories = useMemo(() => ['All', ...new Set(booksState.map(b => toTitleCase(b.category)))], [booksState]);
 
@@ -417,8 +418,6 @@ export default function App() {
     setCheckoutStep(1);
   };
 
-  const toggleWishlist = (book: Book) => {};
-
   const finishCheckout = () => {
     const newOrder: Order = {
       id: Date.now().toString(),
@@ -427,7 +426,6 @@ export default function App() {
       items: [...cart],
     };
     setOrders(prev => [...prev, newOrder]);
-    setPurchasedBooks(prev => [...new Set([...prev, ...cart.map(item => item.id)])]);
     setIsCheckoutOpen(false); 
     setConfirmedOrder(newOrder);
     setCart([]);
@@ -435,11 +433,10 @@ export default function App() {
 
   const handleBookClick = (book: Book) => {
     setSelectedBook(book);
-    setViewedBooks(prev => [...new Set([...prev, book.id])]);
   };
 
   return (
-    <div className={`min-h-screen font-sans ${theme === 'dark' ? 'bg-stone-900 text-stone-100' : 'bg-stone-50 text-stone-900'}`}>
+    <div className={`min-h-screen font-sans ${theme === 'dark' ? 'bg-stone-900 text-white' : 'bg-stone-950 text-white'}`}>
       {error && (
         <div className="fixed top-20 left-0 w-full p-4 z-50">
           <div className="bg-red-100 text-red-700 p-4 rounded-xl shadow-lg flex justify-between items-center">
@@ -459,11 +456,11 @@ export default function App() {
             </div>
             <button onClick={() => setActiveView('orders')} className="hidden md:block text-sm font-bold text-white hover:text-golden-brown-200">Orders</button>
           </div>
-          <div className="hidden md:flex items-center gap-6 text-sm font-bold dark:text-stone-300">
+          <div className="hidden md:flex items-center gap-6 text-sm font-bold text-white">
           </div>
           <div className="flex items-center gap-2 md:gap-4">
             <div className="relative">
-              <Search className="w-5 h-5 absolute left-2 top-1/2 -translate-y-1/2 text-stone-400" />
+              <Search className="w-5 h-5 absolute left-2 top-1/2 -translate-y-1/2 text-stone-200" />
               <input
                 type="text"
                 placeholder="Search..."
@@ -471,21 +468,16 @@ export default function App() {
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   setIsSearching(true);
-                  setTimeout(() => setIsSearching(false), 800);
+                  setTimeout(() => setIsSearching(false), 500);
                 }}
-                className="w-32 md:w-48 pl-9 pr-10 py-1.5 rounded-full border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-golden-brown-500 bg-white text-stone-900 dark:bg-stone-800 dark:border-stone-700 dark:text-white"
+                className="w-32 md:w-48 pl-9 pr-4 py-1.5 rounded-full border border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-golden-brown-500 bg-stone-900 text-white"
               />
-              {isSearching ? (
-                <Loader2 className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 animate-spin" />
-              ) : (
-                <></>
-              )}
               {suggestions.length > 0 && (
                 <div className="absolute top-full left-0 mt-2 w-full md:w-64 bg-white dark:bg-stone-800 border dark:border-stone-700 rounded-lg shadow-lg z-50">
                   {suggestions.map((book) => (
                     <div
                       key={book.id}
-                      className="px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 cursor-pointer text-sm text-stone-900 dark:text-white"
+                      className="px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 cursor-pointer text-sm"
                       onClick={() => {
                         setSearchQuery(book.title);
                         setSuggestions([]);
@@ -531,16 +523,16 @@ export default function App() {
         )}
         {activeView === 'orders' ? (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">Order History</h2>
+            <h2 className="text-2xl font-bold text-white">Order History</h2>
             {orders.length === 0 ? (
-              <p className="text-stone-500">No orders found.</p>
+              <p className="text-stone-200">No orders found.</p>
             ) : (
               <div className="space-y-4">
                 {orders.map(order => (
                   <div key={order.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
                     <div className="flex justify-between mb-4">
                       <p className="font-semibold">Order #{order.id}</p>
-                      <p className="text-stone-500">{order.date}</p>
+                      <p className="text-stone-200">{order.date}</p>
                     </div>
                     <div className="space-y-2">
                       {order.items.map(item => (
@@ -571,16 +563,16 @@ export default function App() {
           </div>
         ) : selectedBook ? (
           <div className="space-y-8">
-            <button onClick={() => setSelectedBook(null)} className="flex items-center gap-2 text-stone-500 hover:text-golden-brown-700">
+            <button onClick={() => setSelectedBook(null)} className="flex items-center gap-2 text-stone-300 hover:text-golden-brown-400">
               <ArrowLeft size={20} /> Back to Products
             </button>
             <div className="grid md:grid-cols-2 gap-12">
               <img src={selectedBook.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={selectedBook.title} className="w-full aspect-[3/4] bg-stone-100 rounded-3xl object-cover" referrerPolicy="no-referrer" />
               <div className="space-y-6">
                 <h1 className="text-4xl font-bold">{selectedBook.title}</h1>
-                <p className="text-xl text-stone-600">{selectedBook.author}</p>
+                <p className="text-xl text-stone-300">{selectedBook.author}</p>
                 <p className="text-2xl font-bold text-golden-brown-700">₦{selectedBook.price}</p>
-                <p className="text-stone-700">{selectedBook.synopsis}</p>
+                <p className="text-stone-200">{selectedBook.synopsis}</p>
                 <button 
                   onClick={() => addToCart(selectedBook)}
                   disabled={addingToCart === selectedBook.id}
@@ -590,7 +582,7 @@ export default function App() {
                 </button>
                 <div className="border-t pt-6">
                   <h3 className="font-bold mb-2">Author Bio</h3>
-                  <p className="text-stone-600">{selectedBook.authorBio}</p>
+                  <p className="text-stone-300">{selectedBook.authorBio}</p>
                 </div>
                 <div className="border-t pt-6">
                   <h3 className="font-bold mb-2">Customer Reviews</h3>
@@ -623,11 +615,11 @@ export default function App() {
                       className="w-full p-2 mb-2 border rounded-lg"
                     />
                     <select 
-                        value={newReview.rating} 
-                        onChange={(e) => setNewReview({...newReview, rating: parseInt(e.target.value)})}
-                        className="w-full p-2 mb-2 border rounded-lg"
-                      >
-                        {[1, 2, 3, 4, 5].map(r => <option key={r} value={r}>{r} Stars</option>)}
+                      value={newReview.rating} 
+                      onChange={(e) => setNewReview({...newReview, rating: parseInt(e.target.value)})}
+                      className="w-full p-2 mb-2 border rounded-lg"
+                    >
+                      {[1, 2, 3, 4, 5].map(r => <option key={r} value={r}>{r} Stars</option>)}
                     </select>
                     <button 
                       onClick={() => addReview(selectedBook.id)}
@@ -644,12 +636,26 @@ export default function App() {
           <>
             <section className="bg-golden-brown-800 text-white rounded-3xl p-8 md:p-16 mb-12 dark:bg-golden-brown-900">
               <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-8">Read. Grow. Repeat.</h1>
+              <div className="relative">
+                <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="flex items-center justify-between w-64 bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
+                  <span>Browse Categories</span>
+                  <ChevronDown size={20} />
+                </button>
+                {isCategoriesOpen && (
+                  <div className="absolute top-full left-0 mt-2 bg-white dark:bg-stone-800 border rounded-2xl p-2 w-48 shadow-xl z-50 text-stone-900 dark:text-stone-100">
+                    {categories.map(cat => (
+                      <button key={cat} onClick={() => { setSelectedCategory(cat === 'All' ? null : cat); setActiveView('products'); setIsCategoriesOpen(false); }} className="block w-full text-left px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-lg">{cat}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </section>
 
             <section>
               <h2 className="text-2xl font-bold mb-8">
                 {selectedCategory ? selectedCategory : searchQuery ? `Search Results for "${searchQuery}"` : 'All'}
               </h2>
+
               {isSearching ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[...Array(4)].map((_, i) => (
@@ -664,10 +670,7 @@ export default function App() {
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {filteredBooks.slice((currentPage - 1) * booksPerPage, currentPage * booksPerPage).map((book) => (
-                      <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center cursor-pointer hover:shadow-lg transition-all duration-300 w-full mx-auto relative" onClick={() => handleBookClick(book)}>
-                        {purchasedBooks.includes(book.id) && (
-                          <div className="absolute top-4 right-4 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">Purchased</div>
-                        )}
+                      <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center cursor-pointer hover:shadow-lg transition-all duration-300 w-full mx-auto" onClick={() => handleBookClick(book)}>
                         <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-32 h-48 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
                         <h3 className="font-semibold mb-1 text-center text-sm">{book.title}</h3>
                         <p className="text-xs text-stone-500 mb-2">{book.author}</p>
@@ -719,36 +722,37 @@ export default function App() {
       </main>
 
       {quickViewBook && (
-        <div className="absolute top-20 left-0 w-full z-50 flex justify-center p-4">
-          <div className="bg-white dark:bg-stone-900 w-full max-w-md rounded-3xl p-4 md:p-6 relative border border-stone-200 dark:border-stone-700 shadow-2xl flex flex-col md:flex-row gap-4 md:gap-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm" onClick={() => setQuickViewBook(null)}></div>
+          <div className="bg-stone-900 w-full max-w-2xl rounded-3xl p-6 md:p-8 relative border border-stone-800 shadow-2xl flex flex-col md:flex-row gap-8">
             <button 
               onClick={() => setQuickViewBook(null)}
-              className="absolute -top-3 -right-3 p-2 bg-stone-900 text-white hover:bg-stone-700 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-stone-300 rounded-full shadow-xl transition z-10"
+              className="absolute -top-3 -right-3 p-3 bg-stone-800 text-white hover:bg-stone-700 rounded-full shadow-xl transition z-10"
             >
               <X size={20} />
             </button>
             <div className="w-full md:w-1/3 shrink-0">
-              <img src={quickViewBook.coverImageUrl || 'https://placehold.co/400x600?text=Book+Cover'} alt={quickViewBook.title} className="w-full aspect-[2/3] rounded-2xl object-cover shadow-md" referrerPolicy="no-referrer" />
+              <img src={quickViewBook.coverImageUrl || 'https://placehold.co/400x600?text=Book+Cover'} alt={quickViewBook.title} className="w-full aspect-[2/3] rounded-2xl object-cover shadow-lg" referrerPolicy="no-referrer" />
             </div>
             <div className="w-full md:w-2/3 flex flex-col">
-              <h2 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-stone-900 dark:text-stone-100">{quickViewBook.title}</h2>
-              <p className="text-base md:text-lg text-stone-600 dark:text-stone-400 mb-3 md:mb-4">{quickViewBook.author}</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-2 text-white">{quickViewBook.title}</h2>
+              <p className="text-lg md:text-xl text-stone-300 mb-4">{quickViewBook.author}</p>
               
-              <div className="flex gap-2 md:gap-4 text-xs md:text-sm text-stone-500 dark:text-stone-400 mb-4 md:mb-6 font-mono border-y py-2 md:py-3 border-stone-100 dark:border-stone-800">
+              <div className="flex gap-4 text-sm text-stone-400 mb-6 font-mono border-y border-stone-800 py-3">
                 <p>Published: {quickViewBook.publicationDate}</p>
                 <p>•</p>
                 <p>{quickViewBook.pageCount} pages</p>
               </div>
               
-              <p className="text-golden-brown-700 dark:text-golden-brown-400 font-bold text-2xl md:text-3xl mb-4 md:mb-6">₦{quickViewBook.price}</p>
+              <p className="text-golden-brown-400 font-bold text-3xl mb-6">₦{quickViewBook.price}</p>
               
-              <h3 className="font-semibold text-stone-900 dark:text-stone-100 mb-1">Synopsis</h3>
-              <p className="text-sm md:text-base text-stone-700 dark:text-stone-300 mb-4 md:mb-8 leading-relaxed flex-grow">{quickViewBook.synopsis}</p>
+              <h3 className="font-semibold text-white mb-2">Synopsis</h3>
+              <p className="text-stone-300 mb-8 leading-relaxed flex-grow">{quickViewBook.synopsis}</p>
               
               <button 
                 onClick={() => { addToCart(quickViewBook); setQuickViewBook(null); }}
                 disabled={addingToCart === quickViewBook.id}
-                className="w-full bg-golden-brown-700 text-white py-3 md:py-4 rounded-xl font-bold hover:bg-golden-brown-800 transition flex items-center justify-center gap-2"
+                className="w-full bg-golden-brown-700 text-white py-4 rounded-xl font-bold hover:bg-golden-brown-600 transition flex items-center justify-center gap-2"
               >
                 {addingToCart === quickViewBook.id ? <Loader2 className="animate-spin" size={18} /> : <><ShoppingCart size={18}/> Add to Cart</>}
               </button>
