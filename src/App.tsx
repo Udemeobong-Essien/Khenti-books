@@ -449,8 +449,8 @@ export default function App() {
         WELCOME TO KHENTI BOOKS
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
-        <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-6 cursor-pointer">
+        <nav className="w-full mx-auto px-0 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-6 cursor-pointer pl-2">
             <div onClick={() => { setSelectedBook(null); setActiveView('products'); setSelectedCategory(null); }}>
               <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-24 md:h-24 object-contain" />
             </div>
