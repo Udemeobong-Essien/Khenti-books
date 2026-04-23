@@ -7,6 +7,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { ShoppingCart, Search, Menu, X, Plus, Minus, Trash2, ChevronRight, CheckCircle, ArrowLeft, Loader2, Sun, Moon, Heart, ChevronUp, MessageCircle, Instagram, Phone, ChevronDown } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { Skeleton } from './components/Skeleton';
+import { onAuthStateChanged, signOut, User, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from './lib/firebase';
+
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
@@ -34,6 +37,34 @@ type Order = {
 };
 
 export default function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
+
+  const handleAuth = async () => {
+    try {
+      if (isRegistering) {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+      setIsLoginOpen(false);
+      setEmail('');
+      setPassword('');
+      setError(null);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+    return unsubscribe;
+  }, []);
+
   const [booksState, setBooks] = useState<Book[]>([
     { id: 1, title: 'Atomic Habits', author: 'James Clear', price: 8000, synopsis: "A practical guide to building good habits and breaking bad ones. Clear introduces the concept of 'atomic habits' — tiny 1% improvements that compound over time into remarkable results. Using a four-step framework (cue, craving, response, reward), he shows that the problem is never the person but the system. You don't rise to your goals; you fall to your systems.", authorBio: 'James Clear is an author and speaker focused on habits, decision-making, and continuous improvement.', reviews: [{ user: 'Jack', comment: 'Profound and practical.', rating: 5 }], coverImageUrl: 'https://i.imgur.com/N4VV8u1.jpeg', publicationDate: '2018-10-16', pageCount: 320, category: 'PERSONAL DEVELOPMENT' },
     { id: 2, title: 'Ikigai', author: 'Héctor García & Francesc Miralles', price: 6500, synopsis: "An exploration of the Japanese concept of ikigai — your reason for being, where what you love, what you're good at, what the world needs, and what you can be paid for overlap. Drawing on interviews with the world's longest-living people in Okinawa, Japan, the book reveals the secrets to a long, purposeful, and joyful life.", authorBio: 'Héctor García & Francesc Miralles are authors who explore Japanese philosophy.', reviews: [{ user: 'Kelly', comment: 'An insightful read.', rating: 4 }], coverImageUrl: 'https://i.imgur.com/0r9aCtb.jpeg', publicationDate: '2017-09-07', pageCount: 208, category: 'PERSONAL DEVELOPMENT' },
@@ -348,7 +379,7 @@ export default function App() {
 
   const filteredBooks = useMemo(() => {
     const uniqueBooks = new Map<number, Book>();
-    booksState.forEach(book => uniqueBooks.set(book.id, book));
+    booksState.map(book => ({...book, synopsis: book.synopsis.replace(/ - /g, ', ')})).forEach(book => uniqueBooks.set(book.id, book));
     
     const sortedBooks = Array.from(uniqueBooks.values())
       .filter((book) => {
@@ -449,16 +480,13 @@ export default function App() {
         WELCOME TO KHENTI BOOKS
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
-        <nav className="w-full mx-auto px-0 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-6 cursor-pointer pl-2">
-            <div onClick={() => { setSelectedBook(null); setActiveView('products'); setSelectedCategory(null); }}>
-              <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-24 md:h-24 object-contain" />
-            </div>
-            <button onClick={() => setActiveView('orders')} className="hidden md:block text-sm font-bold text-white hover:text-golden-brown-200">Orders</button>
+        <nav className="w-full mx-auto px-2 py-2 flex items-center justify-between">
+          <div className="cursor-pointer" onClick={() => { setSelectedBook(null); setActiveView('products'); setSelectedCategory(null); }}>
+              <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-48 md:h-48 object-contain" />
           </div>
-          <div className="hidden md:flex items-center gap-6 text-sm font-bold text-white">
-          </div>
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-2 md:gap-4 ml-auto">
+            <button onClick={() => setActiveView('orders')} className="hidden md:block text-[11px] font-bold text-white hover:text-golden-brown-200 mr-4">Orders</button>
+            <button onClick={() => setIsLoginOpen(true)} className="hidden md:block text-[11px] font-bold text-white hover:text-golden-brown-200 mr-4">Login</button>
             <div className="relative">
               <Search className="w-5 h-5 absolute left-2 top-1/2 -translate-y-1/2 text-white" />
               <input
@@ -470,7 +498,7 @@ export default function App() {
                   setIsSearching(true);
                   setTimeout(() => setIsSearching(false), 500);
                 }}
-                className="w-32 md:w-48 pl-9 pr-4 py-1.5 rounded-full border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-golden-brown-500 bg-transparent text-white placeholder-white"
+                className="w-24 md:w-48 pl-8 pr-2 py-1 rounded-full border border-stone-300 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-golden-brown-500 bg-transparent text-white placeholder-white"
               />
               {suggestions.length > 0 && (
                 <div className="absolute top-full left-0 mt-2 w-full md:w-64 bg-stone-900 border border-stone-700 rounded-lg shadow-lg z-50">
@@ -506,8 +534,13 @@ export default function App() {
           </div>
         </nav>
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t p-4 bg-white dark:bg-stone-900 flex flex-col gap-2">
-            <button onClick={() => { setActiveView('orders'); setIsMobileMenuOpen(false); }} className="text-left py-2 font-semibold text-white">Orders</button>
+          <div className="md:hidden border-t p-4 bg-white dark:bg-stone-900 flex flex-col gap-2 items-end w-24 ml-auto">
+            <button onClick={() => { setActiveView('orders'); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Orders</button>
+            {user ? (
+               <button onClick={() => { signOut(auth); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Logout</button>
+            ) : (
+               <button onClick={() => { setIsLoginOpen(true); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Login</button>
+            )}
           </div>
         )}
       </header>
@@ -566,13 +599,15 @@ export default function App() {
             <button onClick={() => setSelectedBook(null)} className="flex items-center gap-2 text-stone-500 hover:text-golden-brown-700">
               <ArrowLeft size={20} /> Back to Products
             </button>
-            <div className="grid md:grid-cols-2 gap-12">
+            <div className="grid md:grid-cols-2 gap-12 max-w-5xl">
               <img src={selectedBook.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={selectedBook.title} className="w-full aspect-[3/4] bg-stone-100 rounded-3xl object-cover" referrerPolicy="no-referrer" />
               <div className="space-y-6">
                 <h1 className="text-4xl font-bold">{selectedBook.title}</h1>
                 <p className="text-xl text-stone-600">{selectedBook.author}</p>
                 <p className="text-2xl font-bold text-golden-brown-700">₦{selectedBook.price}</p>
-                <p className="text-stone-700">{selectedBook.synopsis}</p>
+                <div className="max-h-[400px] overflow-y-auto pr-2">
+                  <p className="text-stone-700 leading-relaxed">{selectedBook.synopsis}</p>
+                </div>
                 <button 
                   onClick={() => addToCart(selectedBook)}
                   disabled={addingToCart === selectedBook.id}
@@ -724,21 +759,21 @@ export default function App() {
       {quickViewBook && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setQuickViewBook(null)} />
-          <div className="bg-white dark:bg-stone-900 w-full max-w-sm rounded-2xl p-4 relative border border-stone-100 dark:border-stone-800 shadow-xl flex flex-col gap-3 z-10">
+          <div className="bg-white dark:bg-stone-900 w-full max-w-lg rounded-2xl p-6 relative border border-stone-100 dark:border-stone-800 shadow-xl flex flex-col gap-4 z-10">
             <button 
               onClick={() => setQuickViewBook(null)}
-              className="absolute top-2 right-2 p-1.5 bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-full transition z-20"
+              className="absolute top-4 right-4 p-2 bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-full transition z-20"
             >
-              <X size={16} />
+              <X size={20} />
             </button>
-            <div className="flex gap-3">
-              <div className="w-20 shrink-0">
+            <div className="flex gap-6">
+              <div className="w-32 shrink-0">
                 <img src={quickViewBook.coverImageUrl || 'https://placehold.co/400x600?text=Book+Cover'} alt={quickViewBook.title} className="w-full aspect-[2/3] rounded-lg object-cover shadow-sm" referrerPolicy="no-referrer" />
               </div>
-              <div className="flex flex-col justify-center">
-                <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100 leading-tight mb-0.5">{quickViewBook.title}</h2>
-                <p className="text-sm text-stone-600 dark:text-stone-400 mb-1">{quickViewBook.author}</p>
-                <div className="flex gap-2 text-[10px] text-stone-500 dark:text-stone-400 font-mono mb-1">
+              <div className="flex flex-col justify-center gap-1">
+                <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100 leading-tight mb-1">{quickViewBook.title}</h2>
+                <p className="text-sm text-stone-600 dark:text-stone-400 mb-2">{quickViewBook.author}</p>
+                <div className="flex gap-2 text-xs text-stone-500 dark:text-stone-400 font-mono mb-2">
                   <span>{quickViewBook.publicationDate}</span>
                   <span>•</span>
                   <span>{quickViewBook.pageCount} pages</span>
@@ -747,14 +782,14 @@ export default function App() {
               </div>
             </div>
             
-            <p className="text-xs text-stone-600 dark:text-stone-400 line-clamp-3 leading-relaxed">{quickViewBook.synopsis}</p>
+            <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed overflow-y-auto max-h-40">{quickViewBook.synopsis}</p>
             
             <button 
               onClick={() => { addToCart(quickViewBook); setQuickViewBook(null); }}
               disabled={addingToCart === quickViewBook.id}
-              className="w-full bg-golden-brown-700 text-white py-2 rounded-lg font-semibold hover:bg-golden-brown-800 transition flex items-center justify-center gap-1.5 text-sm"
+              className="w-full bg-golden-brown-700 text-white py-3 rounded-lg font-semibold hover:bg-golden-brown-800 transition flex items-center justify-center gap-2 text-sm"
             >
-              {addingToCart === quickViewBook.id ? <Loader2 className="animate-spin" size={16} /> : <><ShoppingCart size={16}/> Add to Cart</>}
+              {addingToCart === quickViewBook.id ? <Loader2 className="animate-spin" size={18} /> : <><ShoppingCart size={18}/> Add to Cart</>}
             </button>
           </div>
         </div>
@@ -798,15 +833,23 @@ export default function App() {
 
       {isLoginOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-sm rounded-3xl p-12">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-8">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold">Login</h2>
+              <h2 className="text-3xl font-bold">{isRegistering ? 'Register' : 'Login'}</h2>
               <X className="cursor-pointer" onClick={() => setIsLoginOpen(false)} />
             </div>
             <div className="space-y-6">
-              <input type="email" placeholder="Email" className="w-full p-4 border rounded-xl" />
-              <input type="password" placeholder="Password" className="w-full p-4 border rounded-xl" />
-              <button className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold">Login</button>
+              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-4 border rounded-xl" />
+              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-4 border rounded-xl" />
+              <button 
+                onClick={handleAuth}
+                className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold"
+              >
+                {isRegistering ? 'Register' : 'Login'}
+              </button>
+              <button onClick={() => setIsRegistering(!isRegistering)} className="w-full text-sm text-stone-500 hover:underline">
+                 {isRegistering ? 'Already have an account? Login' : 'Need an account? Register'}
+              </button>
             </div>
           </div>
         </div>
