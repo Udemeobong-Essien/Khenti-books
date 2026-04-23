@@ -378,8 +378,12 @@ export default function App() {
   };
 
   const filteredBooks = useMemo(() => {
-    const uniqueBooks = new Map<number, Book>();
-    booksState.map(book => ({...book, synopsis: book.synopsis.replace(/ - /g, ', ')})).forEach(book => uniqueBooks.set(book.id, book));
+    const uniqueBooks = new Map<string, Book>();
+    booksState.map(book => ({...book, synopsis: book.synopsis.replace(/ - /g, ', ')})).forEach(book => {
+      if (!uniqueBooks.has(book.title)) {
+        uniqueBooks.set(book.title, book);
+      }
+    });
     
     const sortedBooks = Array.from(uniqueBooks.values())
       .filter((book) => {
