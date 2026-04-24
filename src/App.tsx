@@ -406,14 +406,12 @@ export default function App() {
     
     // De-duplicate if "All" is selected or if there is a search query
     if (selectedCategory === 'All' || searchQuery.trim() !== '') {
-        const uniqueByTitle = new Map<string, Book>();
-        baseFilteredBooks.forEach(book => {
-            const key = `${book.title.trim()}-${book.author.trim()}`.toLowerCase();
-            if (!uniqueByTitle.has(key)) {
-                uniqueByTitle.set(key, book);
-            }
-        });
-        result = Array.from(uniqueByTitle.values());
+        result = baseFilteredBooks.filter((book, index, self) =>
+            index === self.findIndex((b) => (
+                b.title.trim().toLowerCase() === book.title.trim().toLowerCase() &&
+                b.author.trim().toLowerCase() === book.author.trim().toLowerCase()
+            ))
+        );
     }
     
     return result.sort((a, b) => {
@@ -477,13 +475,13 @@ export default function App() {
           </div>
         </div>
       )}
-      <div className="bg-golden-brown-800 text-white text-xs py-2 px-6 flex justify-center">
+      <div className="bg-golden-brown-800 text-white text-xs font-bold md:font-extrabold py-2 px-6 flex justify-center">
         WELCOME TO KHENTI BOOKS
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
-        <nav className="w-full mx-auto px-2 py-2 flex items-center justify-between">
+        <nav className="w-full max-w-7xl mx-auto px-2 py-2 flex items-center justify-between">
           <div className="cursor-pointer" onClick={() => { setSelectedBook(null); setActiveView('products'); setSelectedCategory('All'); setSearchQuery(''); }}>
-              <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-48 md:h-48 object-contain" />
+              <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-32 md:h-32 object-contain" />
           </div>
           <div className="flex items-center gap-2 md:gap-4 ml-auto">
             <button onClick={() => setActiveView('orders')} className="hidden md:block text-[11px] font-bold text-white hover:text-golden-brown-200 mr-4">Orders</button>

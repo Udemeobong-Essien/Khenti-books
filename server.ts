@@ -10,8 +10,19 @@ import * as PaystackSdk from 'paystack-sdk';
 initializeApp();
 const db = getFirestore();
 
-// Initialize Paystack (Secret key must be added to .env)
-const paystack = new PaystackSdk.Paystack(process.env.PAYSTACK_SECRET_KEY || "");
+// Initialize Paystack client lazily
+let paystack: PaystackSdk.Paystack | null = null;
+
+function getPaystack(): PaystackSdk.Paystack {
+  if (!paystack) {
+    const key = process.env.PAYSTACK_SECRET_KEY;
+    if (!key) {
+      throw new Error('PAYSTACK_SECRET_KEY environment variable is required');
+    }
+    paystack = new PaystackSdk.Paystack(key);
+  }
+  return paystack;
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -30,7 +41,7 @@ async function startServer() {
   app.post("/api/initialize-payment", async (req, res) => {
     try {
       const { email, amount, metadata } = req.body;
-      const response = await paystack.transaction.initialize({
+      const response = await getPaystack().transaction.initialize({
         email,
         amount: amount * 100, // Paystack uses kobo
         metadata
@@ -45,7 +56,7 @@ async function startServer() {
   app.post("/api/verify-payment", async (req, res) => {
     try {
       const { reference } = req.body;
-      const response = await paystack.transaction.verify(reference);
+      const response = await getPaystack().transaction.verify(reference);
       
       if (response && response.data && response.data.status === 'success') {
         // Update order status in Firestore
