@@ -302,6 +302,7 @@ export default function App() {
   const [addingToCart, setAddingToCart] = useState<number | null>(null);
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
   const [isSearching, setIsSearching] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'transfer'>('card');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -386,7 +387,7 @@ export default function App() {
     const baseFilteredBooks = processedBooks.filter((book) => {
         const query = searchQuery.toLowerCase();
         // Base filtering
-        const categoryMatch = !selectedCategory || selectedCategory === 'All' || book.category === selectedCategory.toUpperCase() || book.category === toTitleCase(selectedCategory);
+        const categoryMatch = !selectedCategory || selectedCategory === 'All books' || book.category === selectedCategory.toUpperCase() || book.category === toTitleCase(selectedCategory);
         const authorMatch = !selectedAuthor || book.author === selectedAuthor;
         const priceMatch = book.price >= priceRange[0] && book.price <= priceRange[1];
         const year = getYear(book.publicationDate);
@@ -404,8 +405,8 @@ export default function App() {
 
     let result = baseFilteredBooks;
     
-    // De-duplicate if "All" is selected or if there is a search query
-    if (selectedCategory === 'All' || searchQuery.trim() !== '') {
+    // De-duplicate if "All books" is selected, or if there is a search query
+    if (selectedCategory === 'All books' || searchQuery.trim() !== '') {
         result = baseFilteredBooks.filter((book, index, self) =>
             index === self.findIndex((b) => (
                 b.title.trim().toLowerCase() === book.title.trim().toLowerCase() &&
@@ -437,7 +438,7 @@ export default function App() {
       });
   }, [booksState, searchQuery, selectedCategory, selectedAuthor, priceRange, yearRange, pageCountRange]);
 
-  const categories = useMemo(() => ['All', ...new Set(booksState.map(b => toTitleCase(b.category)))], [booksState]);
+  const categories = useMemo(() => ['All books', ...new Set(booksState.map(b => toTitleCase(b.category)))], [booksState]);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -687,7 +688,7 @@ export default function App() {
 
             <section>
               <h2 className="text-2xl font-bold mb-8">
-                {selectedCategory ? selectedCategory : searchQuery ? `Search Results for "${searchQuery}"` : 'All'}
+                {selectedCategory ? selectedCategory : searchQuery ? `Search Results for "${searchQuery}"` : 'All books'}
               </h2>
 
               {(isSearching || loading) ? (
@@ -887,12 +888,38 @@ export default function App() {
             {checkoutStep === 2 && (
               <div className="space-y-4 text-black">
                 <label className="flex items-center gap-3 p-4 border rounded-xl">
-                  <input type="radio" name="payment" /> Credit Card
+                  <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} /> Credit Card
                 </label>
                 <label className="flex items-center gap-3 p-4 border rounded-xl">
-                  <input type="radio" name="payment" /> Bank Transfer
+                  <input type="radio" name="payment" value="transfer" checked={paymentMethod === 'transfer'} onChange={() => setPaymentMethod('transfer')} /> Bank Transfer
                 </label>
-                <button onClick={() => setCheckoutStep(3)} className="w-full bg-stone-900 text-white py-3 md:py-4 rounded-xl font-semibold">Next</button>
+                <button 
+                  onClick={async () => {
+                    if (paymentMethod === 'card') {
+                      try {
+                        const response = await fetch('/api/initialize-payment', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ 
+                            email: user?.email || 'customer@example.com', 
+                            amount: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                            metadata: { orderId: 'temp_order_id' }
+                          })
+                        });
+                        const data = await response.json();
+                        if (data.status && data.data.authorization_url) {
+                          window.open(data.data.authorization_url, '_blank');
+                        }
+                      } catch (err) {
+                        console.error('Payment initialization failed', err);
+                      }
+                    }
+                    setCheckoutStep(3);
+                  }} 
+                  className="w-full bg-stone-900 text-white py-3 md:py-4 rounded-xl font-semibold"
+                >
+                  Next
+                </button>
               </div>
             )}
 
