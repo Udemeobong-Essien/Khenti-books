@@ -41,6 +41,14 @@ export default function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAuth = async () => {
     try {
@@ -87,7 +95,6 @@ export default function App() {
     { id: 19, title: 'Stillness Is the Key', author: 'Ryan Holiday', price: 7000, synopsis: "Drawing on Stoic, Buddhist, and other philosophical traditions, Holiday argues that inner stillness — the ability to slow down, be present, and find calm amidst chaos — is the secret weapon of the greatest leaders, athletes, artists, and thinkers in history. The third book in his Stoic philosophy series.", authorBio: 'Ryan Holiday is an American author and media strategist.', reviews: [], coverImageUrl: 'https://i.imgur.com/GcpzxVd.jpeg', publicationDate: '2019-10-01', pageCount: 288, category: 'PERSONAL DEVELOPMENT' },
     { id: 20, title: 'The Let Them Theory', author: 'Mel Robbins', price: 8500, synopsis: "A simple but transformative mindset shift: let people do what they want, say what they want, think what they want — and stop trying to control them. Robbins argues that the two most liberating words in personal development are 'let them,' and that accepting others' choices is the key to your own freedom and peace.", authorBio: 'Mel Robbins is an American television host, author, and motivational speaker.', reviews: [], coverImageUrl: 'https://i.imgur.com/oDugCZZ.jpeg', publicationDate: '2025-02-18', pageCount: 320, category: 'PERSONAL DEVELOPMENT' },
     { id: 21, title: 'Don\'t Believe Everything You Think', author: 'Joseph Nguyen', price: 6000, synopsis: "An exploration of why the root of all psychological suffering is thinking — specifically, our habit of believing every thought that passes through our mind. Nguyen argues that freedom comes not from positive thinking but from no longer identifying with thought itself, drawing on principles of non-duality and mindfulness.", authorBio: 'Joseph Nguyen is an author focused on mental and emotional well-being.', reviews: [], coverImageUrl: 'https://i.imgur.com/tg6S7FC.jpeg', publicationDate: '2022-12-20', pageCount: 168, category: 'PERSONAL DEVELOPMENT' },
-    { id: 22, title: 'This Is Why We Dream', author: 'Rahul Jandial', price: 0, synopsis: "A neurosurgeon's exploration of the science and meaning of dreams. Dr. Jandial combines cutting-edge brain science with real patient experiences to explain what dreams are, why we have them, what they reveal about our brains and emotions, and how we can use them to enhance creativity, process trauma, and live better lives.", authorBio: 'Rahul Jandial is a neurosurgeon and neuroscientist.', reviews: [], coverImageUrl: 'https://i.imgur.com/CeE0iFT.jpeg', publicationDate: '2024-02-06', pageCount: 288, category: 'PERSONAL DEVELOPMENT' },
     { id: 23, title: 'Never Finished', author: 'David Goggins', price: 7000, synopsis: "The follow-up to Can't Hurt Me. Goggins goes deeper into the mental tools that helped him survive and thrive: the 40% rule, the cookie jar method, and the ability to evolve far beyond what most people think is possible. A sequel that is rawer and more philosophically demanding than its predecessor.", authorBio: 'David Goggins is an American retired United States Navy SEAL and former United States Air Force Tactical Air Control Party member.', reviews: [], coverImageUrl: 'https://i.imgur.com/ipShLC7.jpeg', publicationDate: '2022-12-06', pageCount: 336, category: 'PERSONAL DEVELOPMENT' },
     { id: 24, title: 'Tuesdays with Morrie', author: 'Mitch Albom', price: 6500, synopsis: "The true story of sportswriter Mitch Albom, who reconnects with his beloved college professor Morrie Schwartz as Morrie is dying from ALS. Every Tuesday, they discuss life's greatest questions — love, work, community, family, aging, forgiveness, and death. A small book that contains enormous wisdom.", authorBio: 'Mitch Albom is an American author, journalist, and broadcaster.', reviews: [], coverImageUrl: 'https://i.imgur.com/XCGf90f.jpeg', publicationDate: '1997-08-18', pageCount: 192, category: 'PERSONAL DEVELOPMENT' },
     { id: 25, title: 'The Obstacle Is the Way', author: 'Ryan Holiday', price: 7500, synopsis: "Drawing on the Stoic philosophy of Marcus Aurelius, Holiday argues that obstacles are not problems to be solved but opportunities to be embraced. Through historical examples from Marcus Aurelius to Amelia Earhart to Steve Jobs, he demonstrates that the impediment to action advances action — what stands in the way becomes the way.", authorBio: 'Ryan Holiday is an American author and media strategist.', reviews: [], coverImageUrl: 'https://i.imgur.com/YJ7toFO.jpeg', publicationDate: '2014-05-01', pageCount: 224, category: 'PERSONAL DEVELOPMENT' },
@@ -162,11 +169,9 @@ export default function App() {
     { id: 94, title: 'Master Your Emotions', author: 'Thibaut Meurisse', price: 7500, synopsis: "A practical guide to taking control of your emotions rather than being controlled by them. Meurisse explains how emotions are created, why they become destructive, and the specific techniques — from reframing to acceptance — that build emotional resilience and inner stability.", authorBio: 'Thibaut Meurisse is an author focusing on productivity and personal development.', reviews: [], coverImageUrl: 'https://i.imgur.com/nAjYaHK.jpeg', publicationDate: '2019', pageCount: 166, category: 'PSYCHOLOGY' },
     { id: 95, title: 'Read People Like a Book', author: 'Patrick King', price: 6500, synopsis: "A guide to reading body language, emotions, personalities, and intentions — decoding the hidden messages in everything people do and say. King draws on psychology, behavioural economics, and social science to help readers better understand human behaviour in real time.", authorBio: 'Patrick King is a social interaction coach and author.', reviews: [], coverImageUrl: 'https://i.imgur.com/y3eMyXU.jpeg', publicationDate: '2020', pageCount: 190, category: 'PSYCHOLOGY' },
     { id: 96, title: 'Don\'t Believe Everything You Think', author: 'Joseph Nguyen', price: 6000, synopsis: "An exploration of why the root of all psychological suffering is thinking — specifically, our habit of believing every thought that passes through our mind. Nguyen argues that freedom comes not from positive thinking but from no longer identifying with thought itself, drawing on principles of non-duality and mindfulness.", authorBio: 'Joseph Nguyen is an author focused on mental and emotional well-being.', reviews: [], coverImageUrl: 'https://i.imgur.com/tg6S7FC.jpeg', publicationDate: '2022-12-20', pageCount: 168, category: 'PSYCHOLOGY' },
-    { id: 97, title: 'This Is Why We Dream', author: 'Rahul Jandial', price: 0, synopsis: "A neurosurgeon's exploration of the science and meaning of dreams. Dr. Jandial combines cutting-edge brain science with real patient experiences to explain what dreams are, why we have them, what they reveal about our brains and emotions, and how we can use them to enhance creativity, process trauma, and live better lives.", authorBio: 'Rahul Jandial is a neurosurgeon and neuroscientist.', reviews: [], coverImageUrl: 'https://i.imgur.com/CeE0iFT.jpeg', publicationDate: '2024-02-06', pageCount: 288, category: 'PSYCHOLOGY' },
     { id: 98, title: 'How to Talk to Anyone', author: 'Larry King', price: 7000, synopsis: "Ninety-two little tricks for big success in relationships. Lowndes provides specific, immediately applicable techniques for making a great first impression, mastering small talk, exuding confidence, and building rapport with anyone in any situation — from casual social events to high-stakes professional encounters.", authorBio: 'Larry King', reviews: [], coverImageUrl: 'https://i.imgur.com/iosCVcu.jpeg', publicationDate: '1999', pageCount: 304, category: 'PSYCHOLOGY' },
     { id: 99, title: 'Dopamine Detox', author: 'Thibaut Meurisse', price: 6500, synopsis: "A guide to reclaiming control of your attention in an age of addictive technology. Meurisse explains how constant stimulation from social media, entertainment, and notifications depletes motivation and focus, and provides a practical protocol for resetting your dopamine system to restore drive and clarity.", authorBio: 'Thibaut Meurisse is an author focusing on productivity and personal development.', reviews: [], coverImageUrl: 'https://i.imgur.com/uiUhNhP.jpeg', publicationDate: '2020', pageCount: 132, category: 'PSYCHOLOGY' },
     { id: 100, title: 'Attached', author: 'Amir Levine & Rachel Heller', price: 6500, synopsis: "An application of attachment theory to adult romantic relationships. Levine and Heller identify three attachment styles — secure, anxious, and avoidant — and show how understanding your own attachment style (and your partner's) can transform your relationships by helping you recognise patterns and communicate more effectively.", authorBio: 'Amir Levine & Rachel Heller', reviews: [], coverImageUrl: 'https://i.imgur.com/6h0zwgE.jpeg', publicationDate: '2011-01-04', pageCount: 294, category: 'PSYCHOLOGY' },
-    { id: 101, title: 'How to Win Every Argument', author: 'Madsen Pirie', price: 6500, synopsis: "A practical guide to persuasion, debate, and clear thinking. Drawing from real-world experience, it shows how to build strong arguments, challenge ideas effectively, and communicate with confidence in everyday conversations.", authorBio: 'Madsen Pirie is a British author.', reviews: [], coverImageUrl: 'https://i.imgur.com/hWRopSc.jpeg', publicationDate: '2006', pageCount: 192, category: 'PSYCHOLOGY' },
     { id: 102, title: 'Crime and Punishment', author: 'Fyodor Dostoevsky', price: 16500, synopsis: "The story of Raskolnikov, a destitute student in St. Petersburg who murders a pawnbroker, believing himself to be above conventional morality. The novel traces his psychological torment, his attempts to rationalise the crime, and his ultimate journey toward confession and redemption. One of the greatest psychological novels ever written.", authorBio: 'Fyodor Dostoevsky was a Russian novelist.', reviews: [], coverImageUrl: 'https://i.imgur.com/qA2cW3K.jpeg', publicationDate: '1866', pageCount: 545, category: 'FICTION' },
     { id: 103, title: 'The Daily Stoic', author: 'Ryan Holiday & Stephen Hanselman', price: 10000, synopsis: "A structured daily guide to Stoic philosophy, offering 366 short readings — one for each day of the year. Each entry presents timeless teachings from Stoic philosophers like Marcus Aurelius, Seneca, and Epictetus, paired with modern reflections to help readers build resilience, discipline, and emotional control.", authorBio: 'Ryan Holiday is an American author and media strategist.', reviews: [], coverImageUrl: 'https://i.imgur.com/h5LsiFs.jpeg', publicationDate: '2016', pageCount: 416, category: 'PSYCHOLOGY' },
     { id: 104, title: 'Ego is the Enemy', author: 'Ryan Holiday', price: 6500, synopsis: "This book explores how ego — our inflated sense of self-importance — becomes a major obstacle to success, learning, and fulfillment. Using historical figures, athletes, and leaders, it shows how ego can sabotage ambition and how humility and discipline create lasting achievement.", authorBio: 'Ryan Holiday is an American author and media strategist.', reviews: [], coverImageUrl: 'https://i.imgur.com/qDDg9Du.jpeg', publicationDate: '2016', pageCount: 226, category: 'PSYCHOLOGY' },
@@ -266,11 +271,9 @@ export default function App() {
     { id: 197, title: 'How to Talk to Anyone', author: 'Larry King', price: 7000, synopsis: "Ninety-two little tricks for big success in relationships. Lowndes provides specific, immediately applicable techniques for making a great first impression, mastering small talk, exuding confidence, and building rapport with anyone in any situation — from casual social events to high-stakes professional encounters.", authorBio: 'Larry King', reviews: [], coverImageUrl: 'https://i.imgur.com/iosCVcu.jpeg', publicationDate: '1999', pageCount: 304, category: 'NEGOTIATIONS' },
     { id: 198, title: 'Good Strategy / Bad Strategy', author: 'Richard Rumelt', price: 8500, synopsis: "A rigorous examination of what real strategy is — and what it isn't. Rumelt argues that most so-called strategies are actually goals, visions, or wishes dressed up in strategic language. Good strategy has a kernel: a diagnosis, a guiding policy, and coherent actions. Bad strategy is vague, wishful thinking with no real edge.", authorBio: 'Richard Rumelt is an American academic.', reviews: [], coverImageUrl: 'https://i.imgur.com/w9470C1.jpeg', publicationDate: '2011-07-19', pageCount: 336, category: 'LEADERSHIP' },
     { id: 199, title: 'Think Faster, Talk Smarter', author: 'Matt Abrahams', price: 8000, synopsis: "A Stanford professor's guide to communicating confidently and effectively in spontaneous situations — from Q&A sessions and job interviews to toasts and difficult conversations. Abrahams presents six strategies for managing anxiety, structuring responses, and delivering ideas clearly when there is no time to prepare.", authorBio: 'Matt Abrahams is a lecturer.', reviews: [], coverImageUrl: 'https://i.imgur.com/LvD5lJA.jpeg', publicationDate: '2023-09-12', pageCount: 272, category: 'NEGOTIATIONS' },
-    { id: 200, title: 'How to Win Every Argument', author: 'Madsen Pirie', price: 6500, synopsis: "A practical guide to persuasion, debate, and clear thinking. Drawing from real-world experience, it shows how to build strong arguments, challenge ideas effectively, and communicate with confidence in everyday conversations.", authorBio: 'Madsen Pirie is a philosopher.', reviews: [], coverImageUrl: 'https://i.imgur.com/hWRopSc.jpeg', publicationDate: '2006', pageCount: 192, category: 'NEGOTIATIONS' },
     { id: 201, title: 'Win Every Argument', author: 'Mehdi Hasan', price: 6500, synopsis: "A practical guide to persuasion, debate, and clear thinking. Drawing from real-world experience, Hasan shows how to build strong arguments, challenge ideas effectively, and communicate with confidence in everyday conversations.", authorBio: 'Mehdi Hasan', reviews: [], coverImageUrl: 'https://i.imgur.com/hWRopSc.jpeg', publicationDate: '2023', pageCount: 336, category: 'NEGOTIATIONS' },
     { id: 202, title: 'Influence', author: 'Robert B. Cialdini', price: 12500, synopsis: "A seminal examination of the six universal principles of persuasion: reciprocity, commitment and consistency, social proof, authority, liking, and scarcity. Cialdini spent years studying compliance professionals — salespeople, advertisers, fundraisers — to understand why people say yes and how this knowledge can be used and defended against.", authorBio: 'Robert B. Cialdini is an American psychologist.', reviews: [], coverImageUrl: 'https://i.imgur.com/YOLKaCd.jpeg', publicationDate: '2021', pageCount: 336, category: 'NEGOTIATIONS' },
     { id: 203, title: 'The Communication Book', author: 'Mikael Krogerus & Roman Tschappeler', price: 10000, synopsis: "Tested 44 communication theories that help people exchange information compassionately and effectively, especially in their daily business life. The book provides a guide that transforms how we speak and listen, enabling deeper connection and the peaceful resolution of conflict.", authorBio: 'Mikael Krogerus & Roman Tschappeler', reviews: [], coverImageUrl: 'https://i.imgur.com/6dZhIlb.jpeg', publicationDate: '2020', pageCount: 208, category: 'NEGOTIATIONS' },
-    { id: 204, title: 'Trump: The Art of the Deal', author: 'Donald Trump & Tony Schwartz', price: 7500, synopsis: "Part memoir, part business philosophy, Trump recounts major deals from his career in real estate and entertainment, outlining the principles he claims have guided his success: think big, protect the downside, maximise your options, know your market, and use leverage.", authorBio: 'Donald Trump & Tony Schwartz', reviews: [], coverImageUrl: 'https://i.imgur.com/JNvmm20.jpeg', publicationDate: '1987-11-01', pageCount: 246, category: 'NEGOTIATIONS' },
     { id: 205, title: 'Never Split the Difference', author: 'Chris Voss (with Tahl Raz)', price: 8500, synopsis: "A negotiation guide based on real FBI hostage negotiation tactics. It teaches psychological techniques for persuasion, emotional intelligence, and communication strategies that help achieve better outcomes in business and everyday life.", authorBio: 'Chris Voss is a consultant and author.', reviews: [], coverImageUrl: 'https://i.imgur.com/hlGfh7s.jpeg', publicationDate: '2016', pageCount: 288, category: 'NEGOTIATIONS' }
   ]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -378,11 +381,9 @@ export default function App() {
   };
 
   const filteredBooks = useMemo(() => {
-    const uniqueBooks = new Map<number, Book>();
-    booksState.map(book => ({...book, synopsis: book.synopsis.replace(/ - /g, ', ')})).forEach(book => uniqueBooks.set(book.id, book));
+    const processedBooks = booksState.map(book => ({...book, synopsis: book.synopsis.replace(/ - /g, ', ')}));
     
-    const sortedBooks = Array.from(uniqueBooks.values())
-      .filter((book) => {
+    const baseFilteredBooks = processedBooks.filter((book) => {
         const query = searchQuery.toLowerCase();
         // Base filtering
         const categoryMatch = !selectedCategory || selectedCategory === 'All' || book.category === selectedCategory.toUpperCase() || book.category === toTitleCase(selectedCategory);
@@ -399,8 +400,23 @@ export default function App() {
           book.synopsis.toLowerCase().includes(query);
   
         return categoryMatch && authorMatch && priceMatch && searchMatch && yearMatch && pagesMatch;
-      })
-      .sort((a, b) => {
+    });
+
+    let result = baseFilteredBooks;
+    
+    // De-duplicate if "All" is selected or if there is a search query
+    if (selectedCategory === 'All' || searchQuery.trim() !== '') {
+        const uniqueByTitle = new Map<string, Book>();
+        baseFilteredBooks.forEach(book => {
+            const key = `${book.title.trim()}-${book.author.trim()}`.toLowerCase();
+            if (!uniqueByTitle.has(key)) {
+                uniqueByTitle.set(key, book);
+            }
+        });
+        result = Array.from(uniqueByTitle.values());
+    }
+    
+    return result.sort((a, b) => {
         if (!searchQuery) return 0;
         const query = searchQuery.toLowerCase();
   
@@ -421,21 +437,6 @@ export default function App() {
   
         return getScore(b) - getScore(a);
       });
-    
-    if (searchQuery.trim() !== '' && sortedBooks.length > 0) {
-        // Group by title and take the first one
-        const uniqueByTitle = new Map<string, Book>();
-        sortedBooks.forEach(book => {
-            if (!uniqueByTitle.has(book.title)) {
-                uniqueByTitle.set(book.title, book);
-            }
-        });
-        const uniqueList = Array.from(uniqueByTitle.values());
-        // Still return only one result
-        return [uniqueList[0]];
-    }
-
-    return sortedBooks;
   }, [booksState, searchQuery, selectedCategory, selectedAuthor, priceRange, yearRange, pageCountRange]);
 
   const categories = useMemo(() => ['All', ...new Set(booksState.map(b => toTitleCase(b.category)))], [booksState]);
@@ -481,7 +482,7 @@ export default function App() {
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
         <nav className="w-full mx-auto px-2 py-2 flex items-center justify-between">
-          <div className="cursor-pointer" onClick={() => { setSelectedBook(null); setActiveView('products'); setSelectedCategory(null); }}>
+          <div className="cursor-pointer" onClick={() => { setSelectedBook(null); setActiveView('products'); setSelectedCategory('All'); setSearchQuery(''); }}>
               <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-48 md:h-48 object-contain" />
           </div>
           <div className="flex items-center gap-2 md:gap-4 ml-auto">
@@ -691,13 +692,18 @@ export default function App() {
                 {selectedCategory ? selectedCategory : searchQuery ? `Search Results for "${searchQuery}"` : 'All'}
               </h2>
 
-              {isSearching ? (
+              {(isSearching || loading) ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="space-y-3">
-                      <Skeleton className="aspect-square" />
-                      <Skeleton className="h-4 w-3/4" />
-                      <Skeleton className="h-3 w-1/2" />
+                  {[...Array(8)].map((_, i) => (
+                    <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center w-full mx-auto">
+                      <Skeleton className="w-32 h-48 mb-4" />
+                      <Skeleton className="h-4 w-3/4 mb-1" />
+                      <Skeleton className="h-3 w-1/2 mb-2" />
+                      <Skeleton className="h-4 w-1/3 mb-4" />
+                      <div className="flex flex-col gap-2 mt-auto w-full">
+                        <Skeleton className="h-8 w-full rounded-lg" />
+                        <Skeleton className="h-8 w-full rounded-lg" />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -835,19 +841,19 @@ export default function App() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-sm rounded-3xl p-8">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold">{isRegistering ? 'Register' : 'Login'}</h2>
-              <X className="cursor-pointer" onClick={() => setIsLoginOpen(false)} />
+              <h2 className="text-3xl font-bold text-stone-900">{isRegistering ? 'Register' : 'Login'}</h2>
+              <X className="cursor-pointer text-stone-900" onClick={() => setIsLoginOpen(false)} />
             </div>
             <div className="space-y-6">
-              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-4 border rounded-xl" />
-              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-4 border rounded-xl" />
+              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-4 border rounded-xl text-stone-900 placeholder:text-stone-500" />
+              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-4 border rounded-xl text-stone-900 placeholder:text-stone-500" />
               <button 
                 onClick={handleAuth}
                 className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold"
               >
                 {isRegistering ? 'Register' : 'Login'}
               </button>
-              <button onClick={() => setIsRegistering(!isRegistering)} className="w-full text-sm text-stone-500 hover:underline">
+              <button onClick={() => setIsRegistering(!isRegistering)} className="w-full text-sm text-stone-600 hover:underline">
                  {isRegistering ? 'Already have an account? Login' : 'Need an account? Register'}
               </button>
             </div>
