@@ -571,7 +571,7 @@ export default function App() {
         </div>
       )}
       <div className="bg-golden-brown-800 text-white text-xs font-bold md:font-extrabold py-2 px-6 flex justify-center">
-        {user ? `Hello ${user.displayName || 'User'} WELCOME TO KHENTI BOOKS` : 'WELCOME TO KHENTI BOOKS'}
+        {user ? `Hello ${user.displayName || 'User'}, WELCOME TO KHENTI BOOKS` : 'WELCOME TO KHENTI BOOKS'}
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
         <nav className="w-full max-w-7xl mx-auto px-2 py-2 flex items-center justify-between">
@@ -824,10 +824,10 @@ export default function App() {
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {filteredBooks.slice((currentPage - 1) * booksPerPage, currentPage * booksPerPage).map((book) => (
-                      <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center cursor-pointer hover:shadow-lg transition-all duration-300 w-full mx-auto" onClick={() => handleBookClick(book)}>
+                      <div key={book.id} className="bg-white dark:bg-stone-800 p-6 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 flex flex-col items-center cursor-pointer hover:shadow-lg transition-all duration-300 w-full mx-auto" onClick={() => handleBookClick(book)}>
                         <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-32 h-48 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
-                        <h3 className="font-semibold mb-1 text-center text-sm w-full truncate">{book.title}</h3>
-                        <p className="text-xs text-stone-500 mb-2">{book.author}</p>
+                        <h3 className="font-semibold mb-1 text-center text-sm w-full truncate dark:text-stone-100">{book.title}</h3>
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mb-2">{book.author}</p>
                         <p className="text-golden-brown-700 font-bold mb-4 text-sm">₦{book.price.toLocaleString()}</p>
                         <div className="flex flex-col gap-2 mt-auto w-full">
                           <button 
