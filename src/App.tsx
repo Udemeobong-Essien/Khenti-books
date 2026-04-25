@@ -1063,7 +1063,7 @@ export default function App() {
                         const data = await response.json();
                         if (data.status && data.data.authorization_url) {
                           setPaymentReference(data.data.reference);
-                          window.open(data.data.authorization_url, 'PaystackCheckout', 'width=500,height=700,status=no,resizable=yes,toolbar=no,menubar=no,location=no');
+                          window.open(data.data.authorization_url, '_blank');
                         } else {
                           setPaymentError('Failed to initialize payment, please try again.');
                         }
