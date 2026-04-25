@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { ShoppingCart, Search, Menu, X, Plus, Minus, Trash2, ChevronRight, CheckCircle, ArrowLeft, Loader2, Sun, Moon, Heart, ChevronUp, MessageCircle, Instagram, Phone, ChevronDown } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { Skeleton } from './components/Skeleton';
-import { onAuthStateChanged, signOut, User, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { onAuthStateChanged, signOut, User, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword, updateProfile } from 'firebase/auth';
 import { auth } from './lib/firebase';
 
 
@@ -40,6 +40,8 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -50,19 +52,60 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Standardized error handler
+  const handleError = (error: any, context: string) => {
+    console.error(`${context} error:`, error);
+    
+    let message = '';
+    
+    // Map Firebase auth errors by code
+    const errorCode = error.code || (error.message && error.message.includes('auth/') ? error.message.match(/auth\/[a-z-]+/)?.[0] : null);
+
+    if (errorCode) {
+       switch(errorCode) {
+         case 'auth/email-already-in-use':
+           message = 'This email is already in use. Please use a different email or login.';
+           break;
+         case 'auth/invalid-credential':
+           message = 'Invalid email or password.';
+           break;
+         case 'auth/weak-password':
+           message = 'Password should be at least 6 characters.';
+           break;
+         case 'auth/user-not-found':
+           message = 'No account found with this email.';
+           break;
+         case 'auth/too-many-requests':
+           message = 'Too many requests. Please try again later.';
+           break;
+         default:
+           message = 'An authentication error occurred: ' + errorCode;
+       }
+    } else if (error.message) {
+      message = error.message;
+    } else {
+      message = 'An unexpected error occurred. ' + String(error);
+    }
+    setError(message);
+  }
+
   const handleAuth = async () => {
     try {
       if (isRegistering) {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: `${firstName} ${lastName}` });
+        setSuccessMessage('Registration successful! Welcome.');
       } else {
         await signInWithEmailAndPassword(auth, email, password);
+        setSuccessMessage('Login successful! Welcome back.');
       }
       setIsLoginOpen(false);
       setEmail('');
       setPassword('');
       setError(null);
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
-      setError(err.message);
+      handleError(err, 'Authentication');
     }
   };
 
@@ -284,6 +327,8 @@ export default function App() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [checkoutStep, setCheckoutStep] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -302,7 +347,12 @@ export default function App() {
   const [addingToCart, setAddingToCart] = useState<number | null>(null);
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
   const [isSearching, setIsSearching] = useState(false);
+  const [shippingInfo, setShippingInfo] = useState({ name: '', address: '', city: '' });
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'transfer'>('card');
+  const [paymentReference, setPaymentReference] = useState<string | null>(null);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -377,6 +427,49 @@ export default function App() {
     }
   }, [searchQuery, booksState]);
 
+  // Poll payment status
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+    if (paymentReference) {
+      interval = setInterval(async () => {
+        try {
+          const response = await fetch('/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reference: paymentReference })
+          });
+          const data = await response.json();
+          if (data.success) {
+            setCheckoutStep(3);
+            setPaymentReference(null);
+            if (interval) clearInterval(interval);
+          }
+        } catch (err) {
+          console.error('Polling verification failed', err);
+        }
+      }, 5000); // 5 seconds
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    }
+  }, [paymentReference]);
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Please enter your email address to reset password');
+      return;
+    }
+    setError(null);
+    setSuccessMessage(null);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setSuccessMessage('Password reset email sent. Please check your inbox.');
+    } catch (err: any) {
+      handleError(err, 'Password reset');
+    }
+  };
+
+
   const toTitleCase = (str: string) => {
     return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
@@ -447,6 +540,7 @@ export default function App() {
     setIsCartOpen(false);
     setIsCheckoutOpen(true);
     setCheckoutStep(1);
+    setPaymentReference(null);
   };
 
   const finishCheckout = () => {
@@ -477,16 +571,25 @@ export default function App() {
         </div>
       )}
       <div className="bg-golden-brown-800 text-white text-xs font-bold md:font-extrabold py-2 px-6 flex justify-center">
-        WELCOME TO KHENTI BOOKS
+        {user ? `Hello ${user.displayName || 'User'} WELCOME TO KHENTI BOOKS` : 'WELCOME TO KHENTI BOOKS'}
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
         <nav className="w-full max-w-7xl mx-auto px-2 py-2 flex items-center justify-between">
-          <div className="cursor-pointer" onClick={() => { setSelectedBook(null); setActiveView('products'); setSelectedCategory('All'); setSearchQuery(''); }}>
+          <div className="cursor-pointer" onClick={() => { setSelectedBook(null); setActiveView('products'); setSelectedCategory('All books'); setSearchQuery(''); }}>
               <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-32 md:h-32 object-contain" />
           </div>
           <div className="flex items-center gap-2 md:gap-4 ml-auto">
-            <button onClick={() => setActiveView('orders')} className="hidden md:block text-[11px] font-bold text-white hover:text-golden-brown-200 mr-4">Orders</button>
-            <button onClick={() => setIsLoginOpen(true)} className="hidden md:block text-[11px] font-bold text-white hover:text-golden-brown-200 mr-4">Login</button>
+            {user ? (
+              <div className="hidden md:flex items-center gap-4 mr-4">
+                <button onClick={() => setActiveView('orders')} className="text-[11px] font-bold text-white hover:text-golden-brown-200">Orders</button>
+                <button onClick={() => signOut(auth)} className="text-[11px] font-bold text-white hover:text-golden-brown-200">Logout</button>
+              </div>
+            ) : (
+              <>
+                <button onClick={() => setActiveView('orders')} className="hidden md:block text-[11px] font-bold text-white hover:text-golden-brown-200 mr-4">Orders</button>
+                <button onClick={() => setIsLoginOpen(true)} className="hidden md:block text-[11px] font-bold text-white hover:text-golden-brown-200 mr-4">Login</button>
+              </>
+            )}
             <div className="relative">
               <Search className="w-5 h-5 absolute left-2 top-1/2 -translate-y-1/2 text-white" />
               <input
@@ -535,12 +638,14 @@ export default function App() {
         </nav>
         {isMobileMenuOpen && (
           <div className="md:hidden border-t p-4 bg-white dark:bg-stone-900 flex flex-col gap-2 items-end w-24 ml-auto">
-            <button onClick={() => { setActiveView('orders'); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Orders</button>
-            {user ? (
-               <button onClick={() => { signOut(auth); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Logout</button>
-            ) : (
+             <button onClick={() => { setActiveView('orders'); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Orders</button>
+             {user ? (
+               <>
+                 <button onClick={() => { signOut(auth); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Logout</button>
+               </>
+             ) : (
                <button onClick={() => { setIsLoginOpen(true); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Login</button>
-            )}
+             )}
           </div>
         )}
       </header>
@@ -550,6 +655,15 @@ export default function App() {
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
             <span className="block sm:inline">{error}</span>
             <button className="absolute top-0 bottom-0 right-0 px-4 py-3" onClick={() => setError(null)}>
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+        {successMessage && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6 text-center" role="alert">
+            <p className="font-bold text-lg">Success</p>
+            <p className="text-sm">Welcome to Khenti Books</p>
+            <button className="absolute top-0 bottom-0 right-0 px-4 py-3" onClick={() => setSuccessMessage(null)}>
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -845,16 +959,33 @@ export default function App() {
             </div>
             <div className="space-y-6">
               <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-4 border rounded-xl text-stone-900 placeholder:text-stone-500" />
-              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-4 border rounded-xl text-stone-900 placeholder:text-stone-500" />
-              <button 
-                onClick={handleAuth}
-                className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold"
-              >
-                {isRegistering ? 'Register' : 'Login'}
-              </button>
-              <button onClick={() => setIsRegistering(!isRegistering)} className="w-full text-sm text-stone-600 hover:underline">
-                 {isRegistering ? 'Already have an account? Login' : 'Need an account? Register'}
-              </button>
+              {isRegistering && (
+                <>
+                  <input type="text" placeholder="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full p-4 border rounded-xl text-stone-900 placeholder:text-stone-500" />
+                  <input type="text" placeholder="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full p-4 border rounded-xl text-stone-900 placeholder:text-stone-500" />
+                </>
+              )}
+              
+              {!isForgotPassword ? (
+                <>
+                  <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-4 border rounded-xl text-stone-900 placeholder:text-stone-500" />
+                  <button onClick={handleAuth} className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold">
+                    {isRegistering ? 'Register' : 'Login'}
+                  </button>
+                  {!isRegistering && (
+                    <button onClick={() => setIsForgotPassword(true)} className="w-full text-sm text-stone-600 hover:underline mt-2">Forgot Password?</button>
+                  )}
+                  <button onClick={() => setIsRegistering(!isRegistering)} className="w-full text-sm text-stone-600 hover:underline">
+                     {isRegistering ? 'Already have an account? Login' : 'Need an account? Register'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button onClick={handleForgotPassword} className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold">Send Reset Link</button>
+                  <button onClick={() => setIsForgotPassword(false)} className="w-full text-sm text-stone-600 hover:underline">Back to Login</button>
+                </>
+              )}
+              {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
             </div>
           </div>
         </div>
@@ -868,20 +999,40 @@ export default function App() {
               <button onClick={() => setIsCheckoutOpen(false)} className="bg-stone-100 px-4 py-2 md:px-6 md:py-3 rounded-xl font-semibold hover:bg-stone-200 text-black">Close</button>
             </div>
             
-            <div className="mb-8 flex justify-between text-xs md:text-sm font-semibold text-black">
-              <span className={checkoutStep >= 1 ? 'text-golden-brown-700' : ''}>1. Shipping</span>
-              <ChevronRight size={16} />
-              <span className={checkoutStep >= 2 ? 'text-golden-brown-700' : ''}>2. Payment</span>
-              <ChevronRight size={16} />
-              <span className={checkoutStep >= 3 ? 'text-golden-brown-700' : ''}>3. Confirm</span>
+            <div className="mb-8 flex justify-between items-center text-xs font-semibold text-stone-400">
+              <span className={`flex items-center gap-1 ${checkoutStep >= 1 ? 'text-golden-brown-700' : ''}`}>
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${checkoutStep >= 1 ? 'border-golden-brown-700 bg-golden-brown-50' : 'border-stone-300'}`}>1</span>
+                Shipping
+              </span>
+              <div className="h-0.5 flex-1 mx-2 bg-stone-200"></div>
+              <span className={`flex items-center gap-1 ${checkoutStep >= 2 ? 'text-golden-brown-700' : ''}`}>
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${checkoutStep >= 2 ? 'border-golden-brown-700 bg-golden-brown-50' : 'border-stone-300'}`}>2</span>
+                Payment
+              </span>
+              <div className="h-0.5 flex-1 mx-2 bg-stone-200"></div>
+              <span className={`flex items-center gap-1 ${checkoutStep >= 3 ? 'text-golden-brown-700' : ''}`}>
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${checkoutStep >= 3 ? 'border-golden-brown-700 bg-golden-brown-50' : 'border-stone-300'}`}>3</span>
+                Confirm
+              </span>
             </div>
 
             {checkoutStep === 1 && (
               <div className="space-y-4">
-                <input type="text" placeholder="Full Name" className="w-full p-3 md:p-4 border rounded-xl text-black" />
-                <input type="text" placeholder="Address" className="w-full p-3 md:p-4 border rounded-xl text-black" />
-                <input type="text" placeholder="City" className="w-full p-3 md:p-4 border rounded-xl text-black" />
-                <button onClick={() => setCheckoutStep(2)} className="w-full bg-stone-900 text-white py-3 md:py-4 rounded-xl font-semibold">Next</button>
+                <input type="text" placeholder="Full Name" value={shippingInfo.name} onChange={(e) => setShippingInfo({...shippingInfo, name: e.target.value})} className="w-full p-4 border rounded-xl text-black" />
+                <input type="text" placeholder="Address" value={shippingInfo.address} onChange={(e) => setShippingInfo({...shippingInfo, address: e.target.value})} className="w-full p-4 border rounded-xl text-black" />
+                <input type="text" placeholder="City" value={shippingInfo.city} onChange={(e) => setShippingInfo({...shippingInfo, city: e.target.value})} className="w-full p-4 border rounded-xl text-black" />
+                <button 
+                  onClick={() => {
+                    if (!shippingInfo.name || !shippingInfo.address || !shippingInfo.city) {
+                      alert('Please fill in all shipping fields');
+                      return;
+                    }
+                    setCheckoutStep(2);
+                  }} 
+                  className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold hover:bg-stone-800"
+                >
+                  Next
+                </button>
               </div>
             )}
 
@@ -894,8 +1045,11 @@ export default function App() {
                   <input type="radio" name="payment" value="transfer" checked={paymentMethod === 'transfer'} onChange={() => setPaymentMethod('transfer')} /> Bank Transfer
                 </label>
                 <button 
+                  disabled={isProcessingPayment}
                   onClick={async () => {
+                    setPaymentError(null);
                     if (paymentMethod === 'card') {
+                      setIsProcessingPayment(true);
                       try {
                         const response = await fetch('/api/initialize-payment', {
                           method: 'POST',
@@ -903,23 +1057,62 @@ export default function App() {
                           body: JSON.stringify({ 
                             email: user?.email || 'customer@example.com', 
                             amount: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-                            metadata: { orderId: 'temp_order_id' }
+                            metadata: { orderId: 'temp_order_id', shipping: shippingInfo }
                           })
                         });
                         const data = await response.json();
                         if (data.status && data.data.authorization_url) {
-                          window.open(data.data.authorization_url, '_blank');
+                          setPaymentReference(data.data.reference);
+                          window.open(data.data.authorization_url, 'PaystackCheckout', 'width=500,height=700,status=no,resizable=yes,toolbar=no,menubar=no,location=no');
+                        } else {
+                          setPaymentError('Failed to initialize payment, please try again.');
                         }
                       } catch (err) {
-                        console.error('Payment initialization failed', err);
+                        handleError(err, 'Payment initialization');
+                      } finally {
+                        setIsProcessingPayment(false);
                       }
+                    } else {
+                      setCheckoutStep(3);
                     }
-                    setCheckoutStep(3);
                   }} 
-                  className="w-full bg-stone-900 text-white py-3 md:py-4 rounded-xl font-semibold"
+                  className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold hover:bg-stone-800 disabled:opacity-50"
                 >
-                  Next
+                  {isProcessingPayment ? 'Processing...' : (paymentReference ? 'Pay Now (Open Paystack)' : 'Proceed to Payment')}
                 </button>
+                {paymentReference && (
+                  <button
+                    onClick={async () => {
+                       setPaymentError(null);
+                       setVerifyingPayment(true);
+                       try {
+                         const response = await fetch('/api/verify-payment', {
+                           method: 'POST',
+                           headers: { 'Content-Type': 'application/json' },
+                           body: JSON.stringify({ reference: paymentReference })
+                         });
+                         const data = await response.json();
+                         if (data.success) {
+                           setCheckoutStep(3);
+                         } else {
+                           setPaymentError('Payment verification failed. Please contact support if you have already been charged.');
+                         }
+                       } catch (err) {
+                         console.error('Verification failed', err);
+                         setPaymentError('Failed to verify payment status. Please try again or contact support.');
+                       } finally {
+                         setVerifyingPayment(false);
+                       }
+                    }}
+                    disabled={verifyingPayment}
+                    className="w-full bg-golden-brown-700 text-white py-3 md:py-4 rounded-xl font-semibold mt-2"
+                  >
+                    {verifyingPayment ? 'Verifying...' : 'I have finished paying'}
+                  </button>
+                )}
+                {paymentError && (
+                  <p className="text-red-500 text-sm mt-2">{paymentError}</p>
+                )}
               </div>
             )}
 
