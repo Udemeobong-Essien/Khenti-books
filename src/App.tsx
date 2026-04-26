@@ -626,7 +626,6 @@ export default function App() {
               </div>
             ) : (
               <>
-                <button onClick={() => setActiveView('orders')} className="hidden md:block text-[11px] font-bold text-white hover:text-golden-brown-200 mr-4">Orders</button>
                 <button onClick={() => setIsLoginOpen(true)} className="hidden md:block text-[11px] font-bold text-white hover:text-golden-brown-200 mr-4">Login</button>
               </>
             )}
@@ -678,11 +677,11 @@ export default function App() {
         </nav>
         {isMobileMenuOpen && (
           <div className="md:hidden border-t p-4 bg-white dark:bg-stone-900 flex flex-col gap-2 items-end w-24 ml-auto">
-             <button onClick={() => { setActiveView('orders'); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Orders</button>
+             {user && (
+               <button onClick={() => { setActiveView('orders'); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Orders</button>
+             )}
              {user ? (
-               <>
-                 <button onClick={() => { signOut(auth); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Logout</button>
-               </>
+               <button onClick={() => { signOut(auth); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Logout</button>
              ) : (
                <button onClick={() => { setIsLoginOpen(true); setIsMobileMenuOpen(false); }} className="text-right py-2 font-semibold text-white text-[11px]">Login</button>
              )}
