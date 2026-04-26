@@ -43,7 +43,7 @@ async function startServer() {
       const { email, amount, metadata } = req.body;
       const response = await getPaystack().transaction.initialize({
         email,
-        amount: (amount * 100).toString(),
+        amount: amount * 100, // Paystack uses kobo
         metadata
       });
       res.json(response);
@@ -60,7 +60,7 @@ async function startServer() {
       
       if (response && response.data && response.data.status === 'success') {
         // Update order status in Firestore
-        const orderId = response.data.metadata.orderId as string;
+        const orderId = response.data.metadata.orderId;
         await db.collection('orders').doc(orderId).update({
           status: 'paid',
           paymentDetails: response.data
