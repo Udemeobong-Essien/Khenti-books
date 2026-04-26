@@ -44,12 +44,12 @@ async function startServer() {
       const response = await getPaystack().transaction.initialize({
         email,
         amount: amount * 100, // Paystack uses kobo
-        metadata,
-        channels
+        metadata
       });
       res.json(response);
     } catch (error) {
-      res.status(500).json({ error: "Failed to initialize payment" });
+      console.error("Paystack initialization error:", error);
+      res.status(500).json({ error: "Failed to initialize payment", details: String(error) });
     }
   });
   

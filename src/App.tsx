@@ -1176,8 +1176,7 @@ export default function App() {
                               shippingAddress: shippingInfo.address,
                               shippingCity: shippingInfo.city,
                               method: paymentMethod 
-                            },
-                            channels: paymentMethod === 'transfer' ? ['bank_transfer'] : ['card']
+                            }
                           })
                         });
                         const data = await response.json();
