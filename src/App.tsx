@@ -61,7 +61,7 @@ export default function App() {
     console.error(`${context} error:`, error);
     
     // DEBUG: Log the full error object
-    // console.log("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    console.log("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
 
     let message = '';
     
@@ -503,11 +503,16 @@ export default function App() {
     }
     setError(null);
     setSuccessMessage(null);
+    setIsAuthLoading(true);
     try {
       await sendPasswordResetEmail(auth, email);
       setSuccessMessage('Password reset email sent. Please check your inbox.');
+      setIsForgotPassword(false);
+      setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err: any) {
       handleError(err, 'Password reset');
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
