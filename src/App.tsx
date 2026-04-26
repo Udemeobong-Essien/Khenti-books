@@ -46,6 +46,7 @@ export default function App() {
   const [lastName, setLastName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -135,6 +136,7 @@ export default function App() {
   useEffect(() => {
     if (user) {
       const loadOrders = async () => {
+        setIsLoadingOrders(true);
         try {
           const ordersRef = collection(db, 'users', user.uid, 'orders');
           const q = query(ordersRef, orderBy('createdAt', 'desc'));
@@ -146,6 +148,8 @@ export default function App() {
           setOrders(ordersList);
         } catch (e) {
           handleError(e, 'Loading orders');
+        } finally {
+          setIsLoadingOrders(false);
         }
       };
       loadOrders();
@@ -719,7 +723,13 @@ export default function App() {
         {activeView === 'orders' ? (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">Order History</h2>
-            {orders.length === 0 ? (
+            {isLoadingOrders ? (
+              <div className="space-y-4">
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+              </div>
+            ) : orders.length === 0 ? (
               <p className="text-stone-500">No orders found.</p>
             ) : (
               <div className="space-y-4">
@@ -1106,10 +1116,52 @@ export default function App() {
                   <input type="radio" name="payment" value="transfer" checked={paymentMethod === 'transfer'} onChange={() => setPaymentMethod('transfer')} /> Bank Transfer
                 </label>
                 <button 
-                  disabled={isProcessingPayment}
-                  onClick={async () => {
-                    setPaymentError(null);
-                    if (paymentMethod === 'card' || paymentMethod === 'transfer') {
+                  onClick={() => {
+                    if (paymentMethod !== 'card' && paymentMethod !== 'transfer') {
+                      setPaymentError('Please select a payment method.');
+                      return;
+                    }
+                    setCheckoutStep(3);
+                  }} 
+                  className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold hover:bg-stone-800 disabled:opacity-50"
+                >
+                  Confirm Details
+                </button>
+              </div>
+            )}
+
+            {checkoutStep === 3 && (
+              <div className="space-y-6 text-black">
+                <h3 className="text-xl font-bold">Review Order</h3>
+                <div className="bg-stone-50 p-4 rounded-xl text-sm">
+                  <h4 className="font-semibold mb-2">Order Summary</h4>
+                  {cart.map(item => (
+                    <div key={item.id} className="flex justify-between">
+                      <span>{item.title} x {item.quantity}</span>
+                      <span>₦{item.price * item.quantity}</span>
+                    </div>
+                  ))}
+                  <div className="border-t mt-2 pt-2 flex justify-between font-bold">
+                    <span>Total</span>
+                    <span>₦{cart.reduce((sum, item) => sum + item.price * item.quantity, 0)}</span>
+                  </div>
+                </div>
+                
+                <div className="bg-stone-50 p-4 rounded-xl text-sm">
+                  <h4 className="font-semibold mb-2">Payment Method</h4>
+                  <p>{paymentMethod === 'card' ? 'Credit Card' : 'Bank Transfer'}</p>
+                </div>
+
+                {paymentError && <p className="text-red-500 text-sm">{paymentError}</p>}
+
+                <div className="flex gap-4">
+                  <button onClick={() => setCheckoutStep(2)} className="flex-1 bg-stone-100 text-stone-900 py-4 rounded-xl font-semibold hover:bg-stone-200">
+                    Back
+                  </button>
+                  <button 
+                    disabled={isProcessingPayment}
+                    onClick={async () => {
+                      setPaymentError(null);
                       setIsProcessingPayment(true);
                       try {
                         const response = await fetch('/api/initialize-payment', {
@@ -1141,55 +1193,18 @@ export default function App() {
                       } finally {
                         setIsProcessingPayment(false);
                       }
-                    } else {
-                      setCheckoutStep(3);
-                    }
-                  }} 
-                  className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold hover:bg-stone-800 disabled:opacity-50"
-                >
-                  {isProcessingPayment ? 'Processing...' : (paymentReference ? 'Pay Now (Open Paystack)' : 'Proceed to Payment')}
-                </button>
-                {paymentReference && (
-                  <button
-                    onClick={async () => {
-                       setPaymentError(null);
-                       setVerifyingPayment(true);
-                       try {
-                         const response = await fetch('/api/verify-payment', {
-                           method: 'POST',
-                           headers: { 'Content-Type': 'application/json' },
-                           body: JSON.stringify({ reference: paymentReference })
-                         });
-                         const data = await response.json();
-                         if (data.success) {
-                           setCheckoutStep(3);
-                         } else {
-                           setPaymentError('Payment verification failed. Please contact support if you have already been charged.');
-                         }
-                       } catch (err) {
-                         console.error('Verification failed', err);
-                         setPaymentError('Failed to verify payment status. Please try again or contact support.');
-                       } finally {
-                         setVerifyingPayment(false);
-                       }
                     }}
-                    disabled={verifyingPayment}
-                    className="w-full bg-golden-brown-700 text-white py-3 md:py-4 rounded-xl font-semibold mt-2"
+                    className="flex-1 bg-golden-brown-700 text-white py-4 rounded-xl font-semibold hover:bg-golden-brown-800 disabled:opacity-50"
                   >
-                    {verifyingPayment ? 'Verifying...' : 'I have finished paying'}
+                    {isProcessingPayment ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-5 h-5 animate-spin" /> Confirm & Pay
+                      </span>
+                    ) : (
+                      'Confirm & Pay'
+                    )}
                   </button>
-                )}
-                {paymentError && (
-                  <p className="text-red-500 text-sm mt-2">{paymentError}</p>
-                )}
-              </div>
-            )}
-
-            {checkoutStep === 3 && (
-              <div className="text-center space-y-4 text-black">
-                <CheckCircle className="w-16 h-16 text-golden-brown-700 mx-auto" />
-                <h3 className="text-xl font-bold">Confirm Order</h3>
-                <button onClick={finishCheckout} className="w-full bg-golden-brown-700 text-white py-3 rounded-xl font-semibold">Place Order</button>
+                </div>
               </div>
             )}
           </div>
