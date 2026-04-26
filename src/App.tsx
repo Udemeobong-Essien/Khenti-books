@@ -60,7 +60,7 @@ export default function App() {
     console.error(`${context} error:`, error);
     
     // DEBUG: Log the full error object
-    console.log("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    // console.log("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
 
     let message = '';
     
@@ -83,12 +83,21 @@ export default function App() {
            message = 'Too many requests. Please try again later.';
            break;
          default:
-           message = 'An authentication error occurred: ' + error.code;
+           message = `Authentication error (${error.code}). Please try again.`;
        }
-    } else if (error.message) {
+    } 
+    // Check if it's a network error
+    else if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      message = 'A network error occurred. Please check your internet connection.';
+    }
+    // Check if it's a firestore error
+    else if (error.code && typeof error.code === 'string' && error.code.startsWith('firestore/')) {
+        message = 'A database error occurred. Please try again later.';
+    }
+    else if (error.message) {
       message = error.message;
     } else {
-      message = 'An unexpected error occurred: ' + String(error);
+      message = 'An unexpected error occurred. Please try again.';
     }
     setError(message);
   }
@@ -1077,6 +1086,19 @@ export default function App() {
 
             {checkoutStep === 2 && (
               <div className="space-y-4 text-black">
+                <div className="bg-stone-50 p-4 rounded-xl text-sm">
+                  <h4 className="font-semibold mb-2">Order Summary</h4>
+                  {cart.map(item => (
+                    <div key={item.id} className="flex justify-between">
+                      <span>{item.title} x {item.quantity}</span>
+                      <span>₦{item.price * item.quantity}</span>
+                    </div>
+                  ))}
+                  <div className="border-t mt-2 pt-2 flex justify-between font-bold">
+                    <span>Total</span>
+                    <span>₦{cart.reduce((sum, item) => sum + item.price * item.quantity, 0)}</span>
+                  </div>
+                </div>
                 <label className="flex items-center gap-3 p-4 border rounded-xl">
                   <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} /> Credit Card
                 </label>
@@ -1090,7 +1112,6 @@ export default function App() {
                     if (paymentMethod === 'card' || paymentMethod === 'transfer') {
                       setIsProcessingPayment(true);
                       try {
-                        const popup = window.open('about:blank', 'PaystackCheckout', 'width=500,height=700,status=no,resizable=yes,toolbar=no,menubar=no,location=no');
                         const response = await fetch('/api/initialize-payment', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
@@ -1103,22 +1124,19 @@ export default function App() {
                               shippingAddress: shippingInfo.address,
                               shippingCity: shippingInfo.city,
                               method: paymentMethod 
-                            }
+                            },
+                            channels: paymentMethod === 'transfer' ? ['bank_transfer'] : ['card']
                           })
                         });
                         const data = await response.json();
                         if (data.status && data.data.authorization_url) {
                           setPaymentReference(data.data.reference);
-                          if (popup) {
-                            popup.location.href = data.data.authorization_url;
-                          } else {
-                            window.open(data.data.authorization_url, '_blank');
-                          }
+                          window.location.href = data.data.authorization_url;
                         } else {
-                          if (popup) popup.close();
-                          setPaymentError('Failed to initialize payment, please try again.');
+                          setPaymentError('Payment initialization failed. Please verify your details or try a different payment method.');
                         }
                       } catch (err) {
+                        setPaymentError('A network error occurred while initializing payment. Please check your connection and try again.');
                         handleError(err, 'Payment initialization');
                       } finally {
                         setIsProcessingPayment(false);

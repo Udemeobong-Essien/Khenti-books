@@ -40,11 +40,12 @@ async function startServer() {
   // Initialize Payment
   app.post("/api/initialize-payment", async (req, res) => {
     try {
-      const { email, amount, metadata } = req.body;
+      const { email, amount, metadata, channels } = req.body;
       const response = await getPaystack().transaction.initialize({
         email,
         amount: amount * 100, // Paystack uses kobo
-        metadata
+        metadata,
+        channels
       });
       res.json(response);
     } catch (error) {
