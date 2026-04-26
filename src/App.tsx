@@ -43,6 +43,7 @@ export default function App() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -58,11 +59,9 @@ export default function App() {
     
     let message = '';
     
-    // Map Firebase auth errors by code
-    const errorCode = error.code || (error.message && error.message.includes('auth/') ? error.message.match(/auth\/[a-z-]+/)?.[0] : null);
-
-    if (errorCode) {
-       switch(errorCode) {
+    // Check if it's a firebase auth error
+    if (error.code && typeof error.code === 'string' && error.code.startsWith('auth/')) {
+       switch(error.code) {
          case 'auth/email-already-in-use':
            message = 'This email is already in use. Please use a different email or login.';
            break;
@@ -79,17 +78,18 @@ export default function App() {
            message = 'Too many requests. Please try again later.';
            break;
          default:
-           message = 'An authentication error occurred: ' + errorCode;
+           message = 'An authentication error occurred: ' + error.code;
        }
     } else if (error.message) {
       message = error.message;
     } else {
-      message = 'An unexpected error occurred. ' + String(error);
+      message = 'An unexpected error occurred: ' + String(error);
     }
     setError(message);
   }
 
   const handleAuth = async () => {
+    setIsAuthLoading(true);
     try {
       if (isRegistering) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -106,6 +106,8 @@ export default function App() {
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
       handleError(err, 'Authentication');
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
@@ -571,7 +573,7 @@ export default function App() {
         </div>
       )}
       <div className="bg-golden-brown-800 text-white text-xs font-bold md:font-extrabold py-2 px-6 flex justify-center">
-        {user ? `Hello ${user.displayName || 'User'}, WELCOME TO KHENTI BOOKS` : 'WELCOME TO KHENTI BOOKS'}
+        {user ? 'HEY READER, WELCOME TO KHENTI BOOKS' : 'WELCOME TO KHENTI BOOKS'}
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
         <nav className="w-full max-w-7xl mx-auto px-2 py-2 flex items-center justify-between">
@@ -969,8 +971,8 @@ export default function App() {
               {!isForgotPassword ? (
                 <>
                   <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-4 border rounded-xl text-stone-900 placeholder:text-stone-500" />
-                  <button onClick={handleAuth} className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold">
-                    {isRegistering ? 'Register' : 'Login'}
+                  <button onClick={handleAuth} disabled={isAuthLoading} className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
+                    {isAuthLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : isRegistering ? 'Register' : 'Login'}
                   </button>
                   {!isRegistering && (
                     <button onClick={() => setIsForgotPassword(true)} className="w-full text-sm text-stone-600 hover:underline mt-2">Forgot Password?</button>
@@ -1048,23 +1050,29 @@ export default function App() {
                   disabled={isProcessingPayment}
                   onClick={async () => {
                     setPaymentError(null);
-                    if (paymentMethod === 'card') {
+                    if (paymentMethod === 'card' || paymentMethod === 'transfer') {
                       setIsProcessingPayment(true);
                       try {
+                        const popup = window.open('about:blank', 'PaystackCheckout', 'width=500,height=700,status=no,resizable=yes,toolbar=no,menubar=no,location=no');
                         const response = await fetch('/api/initialize-payment', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ 
                             email: user?.email || 'customer@example.com', 
                             amount: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-                            metadata: { orderId: 'temp_order_id', shipping: shippingInfo }
+                            metadata: { orderId: 'temp_order_id', shipping: shippingInfo, method: paymentMethod }
                           })
                         });
                         const data = await response.json();
                         if (data.status && data.data.authorization_url) {
                           setPaymentReference(data.data.reference);
-                          window.open(data.data.authorization_url, '_blank');
+                          if (popup) {
+                            popup.location.href = data.data.authorization_url;
+                          } else {
+                            window.open(data.data.authorization_url, '_blank');
+                          }
                         } else {
+                          if (popup) popup.close();
                           setPaymentError('Failed to initialize payment, please try again.');
                         }
                       } catch (err) {
