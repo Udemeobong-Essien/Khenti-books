@@ -59,6 +59,9 @@ export default function App() {
   const handleError = (error: any, context: string) => {
     console.error(`${context} error:`, error);
     
+    // DEBUG: Log the full error object
+    console.log("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+
     let message = '';
     
     // Check if it's a firebase auth error
@@ -1095,7 +1098,13 @@ export default function App() {
                           body: JSON.stringify({ 
                             email: user?.email || 'customer@example.com', 
                             amount: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-                            metadata: { orderId: 'temp_order_id', shipping: shippingInfo, method: paymentMethod }
+                            metadata: { 
+                              orderId: 'temp_order_id', 
+                              shippingName: shippingInfo.name,
+                              shippingAddress: shippingInfo.address,
+                              shippingCity: shippingInfo.city,
+                              method: paymentMethod 
+                            }
                           })
                         });
                         const data = await response.json();
