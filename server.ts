@@ -50,8 +50,8 @@ async function startServer() {
       console.log("Paystack initialization response:", response);
       res.json(response);
     } catch (error) {
-      console.error("Paystack initialization error:", error);
-      res.status(500).json({ error: "Failed to initialize payment", details: String(error) });
+      console.error("Paystack initialization error details:", error);
+      res.status(500).json({ error: "Failed to initialize payment", details: error instanceof Error ? error.message : String(error) });
     }
   });
   

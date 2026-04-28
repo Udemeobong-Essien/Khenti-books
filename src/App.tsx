@@ -1169,7 +1169,8 @@ export default function App() {
                       setPaymentError(null);
                       setIsProcessingPayment(true);
                       try {
-                        const response = await fetch('/api/initialize-payment', {
+                        console.log('Sending request to /api/initialize-payment');
+                        const response = await fetch(window.location.origin + '/api/initialize-payment', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ 
@@ -1192,7 +1193,8 @@ export default function App() {
                           setPaymentError('Payment initialization failed. Please verify your details or try a different payment method.');
                         }
                       } catch (err) {
-                        setPaymentError('A network error occurred while initializing payment. Please check your connection and try again.');
+                        const errorMessage = err instanceof Error ? err.message : String(err);
+                        setPaymentError('A network error occurred: ' + errorMessage + '. Please check your connection.');
                         handleError(err, 'Payment initialization');
                       } finally {
                         setIsProcessingPayment(false);
