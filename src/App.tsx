@@ -1170,7 +1170,9 @@ export default function App() {
                       setIsProcessingPayment(true);
                       try {
                         console.log('Sending request to /api/initialize-payment');
-                        const response = await fetch(window.location.origin + '/api/initialize-payment', {
+                        const fullUrl = window.location.origin + '/api/initialize-payment';
+                        console.log('Fetching:', fullUrl);
+                        const response = await fetch(fullUrl, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ 
@@ -1185,12 +1187,18 @@ export default function App() {
                             }
                           })
                         });
+
                         const data = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(data.error || data.details || 'Payment failed');
+                        }
+
                         if (data.status && data.data.authorization_url) {
                           setPaymentReference(data.data.reference);
                           window.location.href = data.data.authorization_url;
                         } else {
-                          setPaymentError('Payment initialization failed. Please verify your details or try a different payment method.');
+                          throw new Error('Payment initialization failed. Please verify your details or try a different payment method.');
                         }
                       } catch (err) {
                         const errorMessage = err instanceof Error ? err.message : String(err);
