@@ -48,15 +48,11 @@ async function startServer() {
   });
 
   // Initialize Payment
-  app.post("/api/initialize-payment", async (req, res) => {
+  app.post("/init-pay", async (req, res) => {
     console.log("INITIALIZE PAYMENT ROUTE HANDLER HIT");
     try {
       const { email, amount, metadata } = req.body;
       console.log("Request body:", req.body);
-      
-      if (!getPaystack) {
-        throw new Error("Paystack not initialized");
-      }
       
       const response = await getPaystack().transaction.initialize({
         email,
