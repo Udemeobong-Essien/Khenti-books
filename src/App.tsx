@@ -1199,8 +1199,8 @@ export default function App() {
                       setPaymentError(null);
                       setIsProcessingPayment(true);
                       try {
-                        console.log('Sending request to /api/init-pay');
-                        const fullUrl = '/api/init-pay';
+                        console.log('Sending request to /api/initialize-payment');
+                        const fullUrl = '/api/initialize-payment';
                         console.log('Fetching:', fullUrl);
                         const response = await fetch(fullUrl, {
                           method: 'POST',

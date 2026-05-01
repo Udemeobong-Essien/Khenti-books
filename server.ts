@@ -48,18 +48,14 @@ async function startServer() {
   });
 
   // Initialize Payment
-  app.post("/api/init-pay", async (req, res) => {
-    console.log("INITIALIZE PAYMENT ROUTE HIT. METHOD:", req.method);
+  app.post("/api/initialize-payment", async (req, res) => {
     try {
       const { email, amount, metadata } = req.body;
-      console.log("Request body:", req.body);
-      
       const response = await getPaystack().transaction.initialize({
         email,
         amount: amount * 100, // Paystack uses kobo
         metadata
       });
-      console.log("Paystack response:", response);
       res.json(response);
     } catch (error) {
       console.error("Payment initialization error:", error);
@@ -67,10 +63,15 @@ async function startServer() {
     }
   });
 
+
   // Verify Payment
-  app.post("/api/verify-payment", async (req, res) => {
+  app.post("/api/verify-payment", (req, res, next) => {
+    console.log("DEBUG: POST /api/verify-payment hit");
+    next();
+  }, async (req, res) => {
     try {
       const { reference } = req.body;
+      console.log("DEBUG: reference", reference);
       const response = await getPaystack().transaction.verify(reference);
       
       if (response && response.data && response.data.status === 'success') {
@@ -84,6 +85,7 @@ async function startServer() {
         res.status(400).json({ error: "Payment verification failed" });
       }
     } catch (error) {
+      console.error("DEBUG: Verify payment error", error);
       res.status(500).json({ error: "Server error during verification" });
     }
   });
