@@ -475,7 +475,7 @@ export default function App() {
     if (paymentReference) {
       interval = setInterval(async () => {
         try {
-          const response = await fetch('/verify-payment', {
+          const response = await fetch('/api/verify-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reference: paymentReference })
@@ -1199,8 +1199,8 @@ export default function App() {
                       setPaymentError(null);
                       setIsProcessingPayment(true);
                       try {
-                        console.log('Sending request to /init-pay');
-                        const fullUrl = '/init-pay';
+                        console.log('Sending request to /api/init-pay');
+                        const fullUrl = '/api/init-pay';
                         console.log('Fetching:', fullUrl);
                         const response = await fetch(fullUrl, {
                           method: 'POST',
