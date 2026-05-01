@@ -48,7 +48,7 @@ async function startServer() {
   });
 
   // Initialize Payment
-  app.post("/api/initialize-payment", async (req, res) => {
+  app.post("/initialize-payment", async (req, res) => {
     try {
       const { email, amount, metadata } = req.body;
       const response = await getPaystack().transaction.initialize({
@@ -65,8 +65,8 @@ async function startServer() {
 
 
   // Verify Payment
-  app.post("/api/verify-payment", (req, res, next) => {
-    console.log("DEBUG: POST /api/verify-payment hit");
+  app.post("/verify-payment", (req, res, next) => {
+    console.log("DEBUG: POST /verify-payment hit");
     next();
   }, async (req, res) => {
     try {
