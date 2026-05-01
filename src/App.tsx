@@ -1177,14 +1177,8 @@ export default function App() {
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ 
                             email: user?.email || 'customer@example.com', 
-                            amount: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-                            metadata: { 
-                              orderId: 'temp_order_id', 
-                              shippingName: shippingInfo.name,
-                              shippingAddress: shippingInfo.address,
-                              shippingCity: shippingInfo.city,
-                              method: paymentMethod 
-                            }
+                            amount: 100, // Fixed amount for testing
+                            metadata: { orderId: 'test_order' }
                           })
                         });
 
