@@ -48,9 +48,12 @@ async function startServer() {
   });
 
   // Initialize Payment
-  app.post("/init-pay", async (req, res) => {
-    console.log("INITIALIZE PAYMENT ROUTE HANDLER HIT");
+  app.all("/api/init-pay", express.json(), async (req, res) => {
+    console.log("INITIALIZE PAYMENT ROUTE HIT. METHOD:", req.method);
     try {
+      if (req.method !== 'POST') {
+        return res.status(405).json({ error: "Method not allowed" });
+      }
       const { email, amount, metadata } = req.body;
       console.log("Request body:", req.body);
       
