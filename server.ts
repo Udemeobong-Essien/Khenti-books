@@ -42,37 +42,42 @@ async function startServer() {
     next();
   });
 
-  // API routes
+   // API routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
 
   // Initialize Payment
   app.post("/api/initialize-payment", async (req, res) => {
+    console.log("INITIALIZE PAYMENT ROUTE HANDLER HIT");
     try {
-      const { email, amount, metadata, channels } = req.body;
-      console.log("Initializing Paystack payment with:", { email, amount, metadata });
+      const { email, amount, metadata } = req.body;
+      console.log("Request body:", req.body);
+      
+      if (!getPaystack) {
+        throw new Error("Paystack not initialized");
+      }
+      
       const response = await getPaystack().transaction.initialize({
         email,
         amount: amount * 100, // Paystack uses kobo
         metadata
       });
-      console.log("Paystack initialization response:", response);
+      console.log("Paystack response:", response);
       res.json(response);
     } catch (error) {
-      console.error("Paystack initialization error details:", error);
+      console.error("Payment initialization error:", error);
       res.status(500).json({ error: "Failed to initialize payment", details: error instanceof Error ? error.message : String(error) });
     }
   });
-  
+
   // Verify Payment
-  app.post("/api/verify-payment", async (req, res) => {
+  app.post("/api/verify-payment", express.json(), async (req, res) => {
     try {
       const { reference } = req.body;
       const response = await getPaystack().transaction.verify(reference);
       
       if (response && response.data && response.data.status === 'success') {
-        // Update order status in Firestore
         const orderId = response.data.metadata.orderId;
         await db.collection('orders').doc(orderId).update({
           status: 'paid',
