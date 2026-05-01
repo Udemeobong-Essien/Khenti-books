@@ -43,12 +43,12 @@ async function startServer() {
   });
 
    // API routes
-  app.get("/api/health", (req, res) => {
+  app.get("/health", (req, res) => {
     res.json({ status: "ok" });
   });
 
   // Initialize Payment
-  app.post("/api/init-pay", async (req, res) => {
+  app.post("/init-pay", express.json(), async (req, res) => {
     console.log("INITIALIZE PAYMENT ROUTE HIT. METHOD:", req.method);
     try {
       const { email, amount, metadata } = req.body;
@@ -68,7 +68,7 @@ async function startServer() {
   });
 
   // Verify Payment
-  app.post("/api/verify-payment", async (req, res) => {
+  app.post("/verify-payment", express.json(), async (req, res) => {
     try {
       const { reference } = req.body;
       const response = await getPaystack().transaction.verify(reference);

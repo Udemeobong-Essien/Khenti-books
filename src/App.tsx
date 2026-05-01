@@ -475,7 +475,7 @@ export default function App() {
     if (paymentReference) {
       interval = setInterval(async () => {
         try {
-          const response = await fetch('/api/verify-payment', {
+          const response = await fetch('/verify-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reference: paymentReference })
@@ -729,11 +729,41 @@ export default function App() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">Order History</h2>
             {isLoadingOrders ? (
-              <div className="space-y-4">
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-24 w-full" />
-              </div>
+                <div className="space-y-4">
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 space-y-4">
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </div>
+                    <Skeleton className="h-16 w-full" />
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-1/4" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </div>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 space-y-4">
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </div>
+                    <Skeleton className="h-16 w-full" />
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-1/4" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </div>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 space-y-4">
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </div>
+                    <Skeleton className="h-16 w-full" />
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-1/4" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </div>
+                  </div>
+                </div>
             ) : orders.length === 0 ? (
               <p className="text-stone-500">No orders found.</p>
             ) : (
@@ -871,14 +901,14 @@ export default function App() {
               {(isSearching || loading) ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[...Array(8)].map((_, i) => (
-                    <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center w-full mx-auto">
-                      <Skeleton className="w-32 h-48 mb-4" />
+                    <div key={i} className="bg-white dark:bg-stone-800 p-6 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 flex flex-col items-center w-full mx-auto">
+                      <Skeleton className="w-32 h-48 mb-4 rounded-lg shadow-md" />
                       <Skeleton className="h-4 w-3/4 mb-1" />
                       <Skeleton className="h-3 w-1/2 mb-2" />
                       <Skeleton className="h-4 w-1/3 mb-4" />
                       <div className="flex flex-col gap-2 mt-auto w-full">
-                        <Skeleton className="h-8 w-full rounded-lg" />
-                        <Skeleton className="h-8 w-full rounded-lg" />
+                        <Skeleton className="h-7 w-full rounded-lg" />
+                        <Skeleton className="h-7 w-full rounded-lg" />
                       </div>
                     </div>
                   ))}
@@ -1169,8 +1199,8 @@ export default function App() {
                       setPaymentError(null);
                       setIsProcessingPayment(true);
                       try {
-                        console.log('Sending request to /api/init-pay');
-                        const fullUrl = '/api/init-pay';
+                        console.log('Sending request to /init-pay');
+                        const fullUrl = '/init-pay';
                         console.log('Fetching:', fullUrl);
                         const response = await fetch(fullUrl, {
                           method: 'POST',
