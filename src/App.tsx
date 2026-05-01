@@ -1188,7 +1188,15 @@ export default function App() {
                           })
                         });
 
-                        const data = await response.json();
+                        const text = await response.text();
+                        console.log('Raw response text:', text);
+                        
+                        let data;
+                        try {
+                            data = JSON.parse(text);
+                        } catch (e) {
+                            throw new Error('Server returned invalid JSON: ' + text);
+                        }
                         
                         if (!response.ok) {
                             throw new Error(data.error || data.details || 'Payment failed');
