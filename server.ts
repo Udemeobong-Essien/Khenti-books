@@ -53,7 +53,7 @@ async function startServer() {
       const { email, amount, metadata } = req.body;
       const response = await getPaystack().transaction.initialize({
         email,
-        amount: amount * 100, // Paystack uses kobo
+        amount: (amount * 100).toString(), // Paystack uses kobo
         metadata
       });
       res.json(response);
@@ -62,8 +62,7 @@ async function startServer() {
       res.status(500).json({ error: "Failed to initialize payment", details: error instanceof Error ? error.message : String(error) });
     }
   });
-
-
+  
   // Verify Payment
   app.post("/verify-payment", (req, res, next) => {
     console.log("DEBUG: POST /verify-payment hit");
@@ -75,7 +74,7 @@ async function startServer() {
       const response = await getPaystack().transaction.verify(reference);
       
       if (response && response.data && response.data.status === 'success') {
-        const orderId = response.data.metadata.orderId;
+        const orderId = response.data.metadata.orderId as string;
         await db.collection('orders').doc(orderId).update({
           status: 'paid',
           paymentDetails: response.data

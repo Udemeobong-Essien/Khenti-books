@@ -1228,7 +1228,7 @@ export default function App() {
 
                         if (data.status && data.data.authorization_url) {
                           setPaymentReference(data.data.reference);
-                          window.location.href = data.data.authorization_url;
+                          window.open(data.data.authorization_url, '_blank');
                         } else {
                           throw new Error('Payment initialization failed. Please verify your details or try a different payment method.');
                         }
