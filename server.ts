@@ -34,7 +34,7 @@ async function startServer() {
 
   // Request logger
   app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    console.log(`[${new Date().toISOString()}] [ENV: ${process.env.NODE_ENV}] ${req.method} ${req.url}`);
     next();
   });
 
