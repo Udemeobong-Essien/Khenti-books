@@ -1200,9 +1200,7 @@ export default function App() {
                       setIsProcessingPayment(true);
                       try {
                         console.log('Sending request to /api/initialize-payment');
-                        const fullUrl = '/api/initialize-payment';
-                        console.log('Fetching:', fullUrl);
-                        const response = await fetch(fullUrl, {
+                        const res = await fetch('/api/initialize-payment', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ 
@@ -1211,22 +1209,13 @@ export default function App() {
                             metadata: { orderId: 'test_order' }
                           })
                         });
-
-                        const text = await response.text();
-                        console.log('Raw response text:', text);
+                        const data = await res.json();
                         
-                        let data;
-                        try {
-                            data = JSON.parse(text);
-                        } catch (e) {
-                            throw new Error('Server returned invalid JSON: ' + text);
-                        }
-                        
-                        if (!response.ok) {
-                            throw new Error(data.error || data.details || 'Payment failed');
+                        if (!res.ok || !data.status) {
+                            throw new Error(data.message || 'Payment initialization failed');
                         }
 
-                        if (data.status && data.data.authorization_url) {
+                        if (data.data && data.data.authorization_url) {
                           setPaymentReference(data.data.reference);
                           window.location.href = data.data.authorization_url;
                         } else {
