@@ -12,7 +12,7 @@ export default async function handler(req, res) {
         Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ email, amount })
+      body: JSON.stringify({ email, amount: amount * 100 })
     });
 
     const data = await response.json();
