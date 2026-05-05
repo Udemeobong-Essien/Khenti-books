@@ -41,6 +41,10 @@ type Order = {
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [discount, setDiscount] = useState(0); 
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -584,6 +588,11 @@ export default function App() {
   const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const startCheckout = () => {
+    if (!user) {
+      setIsCartOpen(false);
+      setIsLoginOpen(true);
+      return;
+    }
     setIsCartOpen(false);
     setIsCheckoutOpen(true);
     setCheckoutStep(1);
@@ -1092,19 +1101,14 @@ export default function App() {
               <button onClick={() => setIsCheckoutOpen(false)} className="bg-stone-100 px-4 py-2 md:px-6 md:py-3 rounded-xl font-semibold hover:bg-stone-200 text-black">Close</button>
             </div>
             
-            <div className="mb-8 flex justify-between items-center text-xs font-semibold text-stone-400">
-              <span className={`flex items-center gap-1 ${checkoutStep >= 1 ? 'text-golden-brown-700' : ''}`}>
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${checkoutStep >= 1 ? 'border-golden-brown-700 bg-golden-brown-50' : 'border-stone-300'}`}>1</span>
+            <div className="mb-8 flex justify-between items-center text-sm font-bold text-stone-900 border-b pb-6">
+              <span className={`flex items-center gap-2 ${checkoutStep >= 1 ? 'text-black' : 'text-stone-400'}`}>
+                <span className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${checkoutStep >= 1 ? 'border-black bg-stone-100' : 'border-stone-300'}`}>1</span>
                 Shipping
               </span>
-              <div className="h-0.5 flex-1 mx-2 bg-stone-200"></div>
-              <span className={`flex items-center gap-1 ${checkoutStep >= 2 ? 'text-golden-brown-700' : ''}`}>
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${checkoutStep >= 2 ? 'border-golden-brown-700 bg-golden-brown-50' : 'border-stone-300'}`}>2</span>
-                Payment
-              </span>
-              <div className="h-0.5 flex-1 mx-2 bg-stone-200"></div>
-              <span className={`flex items-center gap-1 ${checkoutStep >= 3 ? 'text-golden-brown-700' : ''}`}>
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${checkoutStep >= 3 ? 'border-golden-brown-700 bg-golden-brown-50' : 'border-stone-300'}`}>3</span>
+              <div className="h-0.5 flex-1 mx-4 bg-stone-200"></div>
+              <span className={`flex items-center gap-2 ${checkoutStep >= 2 ? 'text-black' : 'text-stone-400'}`}>
+                <span className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${checkoutStep >= 2 ? 'border-black bg-stone-100' : 'border-stone-300'}`}>2</span>
                 Confirm
               </span>
             </div>
@@ -1130,42 +1134,6 @@ export default function App() {
             )}
 
             {checkoutStep === 2 && (
-              <div className="space-y-4 text-black">
-                <div className="bg-stone-50 p-4 rounded-xl text-sm">
-                  <h4 className="font-semibold mb-2">Order Summary</h4>
-                  {cart.map(item => (
-                    <div key={item.id} className="flex justify-between">
-                      <span>{item.title} x {item.quantity}</span>
-                      <span>₦{item.price * item.quantity}</span>
-                    </div>
-                  ))}
-                  <div className="border-t mt-2 pt-2 flex justify-between font-bold">
-                    <span>Total</span>
-                    <span>₦{cart.reduce((sum, item) => sum + item.price * item.quantity, 0)}</span>
-                  </div>
-                </div>
-                <label className="flex items-center gap-3 p-4 border rounded-xl">
-                  <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} /> Credit Card
-                </label>
-                <label className="flex items-center gap-3 p-4 border rounded-xl">
-                  <input type="radio" name="payment" value="transfer" checked={paymentMethod === 'transfer'} onChange={() => setPaymentMethod('transfer')} /> Bank Transfer
-                </label>
-                <button 
-                  onClick={() => {
-                    if (paymentMethod !== 'card' && paymentMethod !== 'transfer') {
-                      setPaymentError('Please select a payment method.');
-                      return;
-                    }
-                    setCheckoutStep(3);
-                  }} 
-                  className="w-full bg-stone-900 text-white py-4 rounded-xl font-semibold hover:bg-stone-800 disabled:opacity-50"
-                >
-                  Confirm Details
-                </button>
-              </div>
-            )}
-
-            {checkoutStep === 3 && (
               <div className="space-y-6 text-black">
                 <h3 className="text-xl font-bold">Review Order</h3>
                 <div className="bg-stone-50 p-4 rounded-xl text-sm">
@@ -1176,26 +1144,52 @@ export default function App() {
                       <span>₦{item.price * item.quantity}</span>
                     </div>
                   ))}
-                  <div className="border-t mt-2 pt-2 flex justify-between font-bold">
+                  <div className="border-t mt-2 pt-2 flex justify-between font-bold text-lg">
                     <span>Total</span>
-                    <span>₦{cart.reduce((sum, item) => sum + item.price * item.quantity, 0)}</span>
+                    <span>₦{Math.round(cart.reduce((sum, item) => sum + item.price * item.quantity, 0) * (1 - discount))}</span>
                   </div>
                 </div>
-                
-                <div className="bg-stone-50 p-4 rounded-xl text-sm">
-                  <h4 className="font-semibold mb-2">Payment Method</h4>
-                  <p>{paymentMethod === 'card' ? 'Credit Card' : 'Bank Transfer'}</p>
+
+                <div className="flex gap-2">
+                  <input type="text" placeholder="Coupon Code" value={couponCode} onChange={(e) => {
+                    setCouponCode(e.target.value);
+                    setCouponError(null);
+                    setCouponSuccess(null);
+                  }} className="flex-1 p-4 border rounded-xl text-black" />
+                  <button onClick={() => {
+                    const coupons: { [key: string]: number } = {
+                      'SAVE5': 0.05,
+                      'SAVE10': 0.10,
+                      'SAVE20': 0.20
+                    };
+                    if (coupons[couponCode]) {
+                      setDiscount(coupons[couponCode]);
+                      setCouponSuccess(`${couponCode} applied! ${coupons[couponCode] * 100}% off`);
+                      setCouponError(null);
+                    } else {
+                      setDiscount(0);
+                      setCouponError('Invalid coupon code');
+                      setCouponSuccess(null);
+                    }
+                  }} className="bg-stone-900 text-white px-6 py-4 rounded-xl font-semibold">Apply</button>
                 </div>
+                {couponError && <p className="text-red-500 text-sm">{couponError}</p>}
+                {couponSuccess && <p className="text-green-600 text-sm">{couponSuccess}</p>}
 
                 {paymentError && <p className="text-red-500 text-sm">{paymentError}</p>}
 
                 <div className="flex gap-4">
-                  <button onClick={() => setCheckoutStep(2)} className="flex-1 bg-stone-100 text-stone-900 py-4 rounded-xl font-semibold hover:bg-stone-200">
+                  <button onClick={() => setCheckoutStep(1)} className="flex-1 bg-stone-100 text-stone-900 py-4 rounded-xl font-semibold hover:bg-stone-200">
                     Back
                   </button>
                   <button 
                     disabled={isProcessingPayment}
                     onClick={async () => {
+                      if (!user) {
+                        setPaymentError('Please log in to complete your checkout.');
+                        setIsLoginOpen(true);
+                        return;
+                      }
                       setPaymentError(null);
                       setIsProcessingPayment(true);
                       try {
@@ -1205,7 +1199,7 @@ export default function App() {
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ 
                             email: user?.email || 'customer@example.com', 
-                            amount: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                            amount: Math.round(cart.reduce((sum, item) => sum + item.price * item.quantity, 0) * (1 - discount)),
                             metadata: { orderId: 'test_order' }
                           })
                         });
