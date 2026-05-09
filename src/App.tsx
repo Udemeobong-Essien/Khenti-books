@@ -9,7 +9,7 @@ import { GoogleGenAI } from "@google/genai";
 import { Skeleton } from './components/Skeleton';
 import { onAuthStateChanged, signOut, User, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword, updateProfile } from 'firebase/auth';
 import { auth, db } from './lib/firebase';
-import { collection, addDoc, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
 
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
@@ -41,11 +41,13 @@ type Order = {
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0); 
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
   const [activeBookIndex, setActiveBookIndex] = useState(0);
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -373,6 +375,19 @@ export default function App() {
     { id: 205, title: 'Never Split the Difference', author: 'Chris Voss (with Tahl Raz)', price: 8500, synopsis: "A negotiation guide based on real FBI hostage negotiation tactics. It teaches psychological techniques for persuasion, emotional intelligence, and communication strategies that help achieve better outcomes in business and everyday life.", authorBio: 'Chris Voss is a consultant and author.', reviews: [], coverImageUrl: 'https://i.imgur.com/hlGfh7s.jpeg', publicationDate: '2016', pageCount: 288, category: 'NEGOTIATIONS' }
   ]);
   const [cart, setCart] = useState<CartItem[]>([]);
+  useEffect(() => {
+    if (!user) {
+      setOrders([]);
+      return;
+    }
+    const q = query(collection(db, 'users', user.uid, 'orders'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
+      setOrders(newOrders);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeView, setActiveView] = useState<'products' | 'orders'>('products');
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -621,7 +636,6 @@ export default function App() {
         id: docRef.id,
         ...newOrderData
       };
-      setOrders(prev => [...prev, newOrder]);
       setIsCheckoutOpen(false); 
       setConfirmedOrder(newOrder);
       setCart([]);
@@ -834,7 +848,7 @@ export default function App() {
                 <button 
                   onClick={() => addToCart(selectedBook)}
                   disabled={addingToCart === selectedBook.id}
-                  className="bg-stone-900 text-white px-8 py-3 rounded-xl font-semibold hover:bg-golden-brown-700 transition flex items-center gap-2"
+                  className="bg-stone-900 text-white px-8 py-3 rounded-xl font-semibold hover:bg-stone-800 transition flex items-center gap-2 dark:bg-golden-brown-700 dark:text-white dark:hover:bg-white dark:hover:text-black"
                 >
                   {addingToCart === selectedBook.id ? <Loader2 className="animate-spin" size={20} /> : 'Add to Cart'}
                 </button>
@@ -852,39 +866,49 @@ export default function App() {
                     <p className="text-sm text-stone-600 mb-4">No reviews yet.</p>
                   )}
                   {selectedBook.reviews.map((review, idx) => (
-                    <div key={idx} className="bg-stone-100 p-4 rounded-xl mb-2">
-                      <p className="font-semibold">{review.user} - {review.rating}/5</p>
-                      <p className="text-stone-600">{review.comment}</p>
+                    <div key={idx} className="bg-stone-100 dark:bg-stone-800 p-4 rounded-xl mb-2">
+                      <p className="font-semibold text-stone-900 dark:text-stone-100">{review.user} - <span className="text-golden-brown-700">{review.rating}/5</span></p>
+                      <p className="text-stone-700 dark:text-stone-300">{review.comment}</p>
                     </div>
                   ))}
-                  <div className="mt-6 bg-stone-50 p-4 rounded-xl border">
-                    <h4 className="font-bold mb-2">Submit a Review</h4>
-                    <input 
-                      type="text" 
-                      placeholder="Your Name" 
-                      value={newReview.user} 
-                      onChange={(e) => setNewReview({...newReview, user: e.target.value})}
-                      className="w-full p-2 mb-2 border rounded-lg"
-                    />
-                    <textarea 
-                      placeholder="Your Comment" 
-                      value={newReview.comment} 
-                      onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
-                      className="w-full p-2 mb-2 border rounded-lg"
-                    />
-                    <select 
-                      value={newReview.rating} 
-                      onChange={(e) => setNewReview({...newReview, rating: parseInt(e.target.value)})}
-                      className="w-full p-2 mb-2 border rounded-lg"
-                    >
-                      {[1, 2, 3, 4, 5].map(r => <option key={r} value={r}>{r} Stars</option>)}
-                    </select>
+                  <div className="mt-6">
                     <button 
-                      onClick={() => addReview(selectedBook.id)}
-                      className="w-full bg-golden-brown-700 text-white py-2 rounded-lg font-semibold hover:bg-golden-brown-800 transition"
+                      onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
+                      className="w-full bg-stone-200 dark:bg-stone-700 text-stone-900 dark:text-stone-100 py-2 rounded-lg font-semibold hover:bg-stone-300 dark:hover:bg-stone-600 transition"
                     >
-                      Submit Review
+                      {isReviewFormOpen ? 'Hide Review Form' : 'Submit a Review'}
                     </button>
+                    {isReviewFormOpen && (
+                      <div className="mt-4 bg-stone-50 dark:bg-stone-800 p-4 rounded-xl border border-stone-200 dark:border-stone-700">
+                        <h4 className="font-bold mb-2 text-stone-900 dark:text-stone-100">Submit a Review</h4>
+                        <input 
+                          type="text" 
+                          placeholder="Your Name" 
+                          value={newReview.user} 
+                          onChange={(e) => setNewReview({...newReview, user: e.target.value})}
+                          className="w-full p-2 mb-2 border rounded-lg dark:bg-stone-900 dark:border-stone-600 dark:text-white"
+                        />
+                        <textarea 
+                          placeholder="Your Comment" 
+                          value={newReview.comment} 
+                          onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
+                          className="w-full p-2 mb-2 border rounded-lg dark:bg-stone-900 dark:border-stone-600 dark:text-white"
+                        />
+                        <select 
+                          value={newReview.rating} 
+                          onChange={(e) => setNewReview({...newReview, rating: parseInt(e.target.value)})}
+                          className="w-full p-2 mb-2 border rounded-lg dark:bg-stone-900 dark:border-stone-600 dark:text-white"
+                        >
+                          {[1, 2, 3, 4, 5].map(r => <option key={r} value={r}>{r} Stars</option>)}
+                        </select>
+                        <button 
+                          onClick={() => addReview(selectedBook.id)}
+                          className="w-full bg-golden-brown-700 text-white py-2 rounded-lg font-semibold hover:bg-golden-brown-800 transition"
+                        >
+                          Submit Review
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -948,7 +972,7 @@ export default function App() {
                           <button 
                             onClick={(e) => { e.stopPropagation(); addToCart(book); }}
                             disabled={addingToCart === book.id}
-                            className="w-full bg-stone-900 text-white py-1.5 rounded-lg text-xs font-semibold hover:bg-stone-700 transition flex items-center justify-center gap-2"
+                            className="w-full bg-stone-900 text-white py-1.5 rounded-lg text-xs font-semibold hover:bg-stone-700 transition flex items-center justify-center gap-2 dark:bg-golden-brown-700 dark:text-white dark:hover:bg-white dark:hover:text-black"
                           >
                             {addingToCart === book.id ? <Loader2 className="animate-spin" size={14} /> : 'Add to Cart'}
                           </button>
@@ -980,6 +1004,19 @@ export default function App() {
                 <p className="text-center text-stone-500 py-12">No books found matching your search.</p>
               )}
             </section>
+            {(!selectedCategory || selectedCategory === 'All books') && !searchQuery && (
+              <section className="bg-stone-100 dark:bg-stone-900/50 py-10 px-6 my-10 rounded-3xl mx-4 md:mx-auto max-w-5xl border border-stone-200 dark:border-stone-700">
+                <div className="max-w-3xl mx-auto text-stone-800 dark:text-stone-300">
+                  <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Founder Note</h2>
+                  <p className="mb-6">Khenti Books started with a simple belief.</p>
+                  <p className="mb-6">The right book can change how you see yourself, other people, money, power, work, ambition, and the world around you.</p>
+                  <p className="mb-6">For most of my life, books were where I went to ask bigger questions. Over time, I realized the most valuable books are not always the loudest or the most popular ones. They are the ones that quietly stay with you long after you finish the last page.</p>
+                  <p className="mb-6">Every single title on this shelf was chosen with that in mind.</p>
+                  <p className="mb-6 font-semibold">Welcome to Khenti Books.</p>
+                  <p className="mb-6 font-bold text-black dark:text-white">Khenti Emmanuel</p>
+                </div>
+              </section>
+            )}
           </>
         )}
       </main>
@@ -1015,7 +1052,7 @@ export default function App() {
             <button 
               onClick={() => { addToCart(quickViewBook); setQuickViewBook(null); }}
               disabled={addingToCart === quickViewBook.id}
-              className="w-full bg-golden-brown-700 text-white py-3 rounded-lg font-semibold hover:bg-golden-brown-800 transition flex items-center justify-center gap-2 text-sm"
+              className="w-full bg-golden-brown-700 text-white py-3 rounded-lg font-semibold hover:bg-golden-brown-800 transition flex items-center justify-center gap-2 text-sm dark:bg-golden-brown-700 dark:text-white dark:hover:bg-white dark:hover:text-black"
             >
               {addingToCart === quickViewBook.id ? <Loader2 className="animate-spin" size={18} /> : <><ShoppingCart size={18}/> Add to Cart</>}
             </button>
@@ -1296,28 +1333,34 @@ export default function App() {
           
           {/* Desktop Grid */}
           <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-8">
-            {booksState.slice(0, 3).map((book) => (
+            {booksState
+              .filter(book => !selectedBook || book.id !== selectedBook.id)
+              .slice(0, 3)
+              .map((book) => (
               <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center">
                 <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
                 <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
                 <p className="text-sm text-stone-500 mb-2">{book.author}</p>
                 <p className="text-sm text-center text-stone-600 mb-4 italic">"{book.synopsis.substring(0, 100)}..."</p>
                 <p className="font-bold text-golden-brown-700 mb-4">₦{book.price.toLocaleString()}</p>
-                <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-stone-800 transition">Shop Now</button>
+                <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-golden-brown-700 transition">Shop Now</button>
               </div>
             ))}
           </div>
 
           {/* Mobile Carousel */}
           <div className="md:hidden relative h-[540px]">
-             {booksState.slice(0, 3).map((book, index) => (
+             {booksState
+              .filter(book => !selectedBook || book.id !== selectedBook.id)
+              .slice(0, 3)
+              .map((book, index) => (
                 <div key={book.id} className={`absolute top-0 left-0 w-full bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center transition-opacity duration-500 ${index === activeBookIndex ? 'opacity-100' : 'opacity-0'}`}>
                   <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
                   <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
                   <p className="text-sm text-stone-500 mb-2">{book.author}</p>
                   <p className="text-sm text-center text-stone-600 mb-4 italic">"{book.synopsis.substring(0, 100)}..."</p>
                   <p className="font-bold text-golden-brown-700 mb-4">₦{book.price.toLocaleString()}</p>
-                  <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-stone-800 transition">Shop Now</button>
+                  <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-golden-brown-700 transition">Shop Now</button>
                 </div>
              ))}
              
@@ -1338,17 +1381,7 @@ export default function App() {
         </div>
       </section>
 
-      <section className="bg-stone-100 dark:bg-stone-900/50 py-10 px-6 my-10 rounded-3xl mx-4 md:mx-auto max-w-5xl border border-stone-200 dark:border-stone-700">
-        <div className="max-w-3xl mx-auto text-stone-800 dark:text-stone-300">
-          <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Founder Note</h2>
-          <p className="mb-6">Khenti Books started with a simple belief.</p>
-          <p className="mb-6">The right book can change how you see yourself, other people, money, power, work, ambition, and the world around you.</p>
-          <p className="mb-6">For most of my life, books were where I went to ask bigger questions. Over time, I realized the most valuable books are not always the loudest or the most popular ones. They are the ones that quietly stay with you long after you finish the last page.</p>
-          <p className="mb-6">Every single title on this shelf was chosen with that in mind.</p>
-          <p className="mb-6 font-semibold">Welcome to Khenti Books.</p>
-          <p className="mb-6 font-bold text-black dark:text-white">Khenti Emmanuel</p>
-        </div>
-      </section>
+
 
       <footer className="border-t border-stone-200 mt-20 py-16 text-center text-sm text-stone-500">
         <div className="flex justify-center gap-6 mb-4">
