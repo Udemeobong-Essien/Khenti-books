@@ -893,7 +893,7 @@ export default function App() {
         ) : (
           <>
             <section className="bg-golden-brown-800 text-white rounded-3xl p-8 md:p-16 mb-12 dark:bg-golden-brown-900">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-8 leading-tight">Some books entertain you.<br />Others quietly change your life.</h1>
+              <h1 className="text-base sm:text-xl md:text-3xl font-bold mb-8 leading-tight">Some books entertain you.<br className="md:hidden" /> Others quietly change your life.</h1>
               <div className="relative">
                 <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="flex items-center justify-between w-64 bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
                   <span>Browse Categories</span>
@@ -1301,7 +1301,7 @@ export default function App() {
                 <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
                 <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
                 <p className="text-sm text-stone-500 mb-2">{book.author}</p>
-                <p className="text-sm text-center text-stone-600 mb-4 italic">"This book will reshape your perspective on life's challenges."</p>
+                <p className="text-sm text-center text-stone-600 mb-4 italic">"{book.synopsis.substring(0, 100)}..."</p>
                 <p className="font-bold text-golden-brown-700 mb-4">₦{book.price.toLocaleString()}</p>
                 <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-stone-800 transition">Shop Now</button>
               </div>
@@ -1315,7 +1315,7 @@ export default function App() {
                   <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
                   <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
                   <p className="text-sm text-stone-500 mb-2">{book.author}</p>
-                  <p className="text-sm text-center text-stone-600 mb-4 italic">"This book will reshape your perspective on life's challenges."</p>
+                  <p className="text-sm text-center text-stone-600 mb-4 italic">"{book.synopsis.substring(0, 100)}..."</p>
                   <p className="font-bold text-golden-brown-700 mb-4">₦{book.price.toLocaleString()}</p>
                   <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-stone-800 transition">Shop Now</button>
                 </div>
