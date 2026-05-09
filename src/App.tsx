@@ -886,7 +886,7 @@ export default function App() {
         ) : (
           <>
             <section className="bg-golden-brown-800 text-white rounded-3xl p-8 md:p-16 mb-12 dark:bg-golden-brown-900">
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-8 whitespace-nowrap -ml-4">Read. Grow. Repeat.</h1>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-8 leading-tight">Some books entertain you.<br />Others quietly change your life.</h1>
               <div className="relative">
                 <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="flex items-center justify-between w-64 bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
                   <span>Browse Categories</span>
@@ -1281,6 +1281,34 @@ export default function App() {
           </div>
         </div>
       )}
+
+      <section className="py-16 px-4 md:px-16 border-t">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold mb-8 text-black">Khenti Recommends</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {booksState.slice(0, 3).map((book) => (
+              <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center cursor-pointer hover:shadow-lg transition-all" onClick={() => handleBookClick(book)}>
+                <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
+                <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
+                <p className="text-sm text-stone-500 mb-2">{book.author}</p>
+                <p className="font-bold text-golden-brown-700">₦{book.price.toLocaleString()}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-stone-50 py-16 px-4 md:px-16">
+        <div className="max-w-3xl mx-auto text-stone-800">
+          <h2 className="text-3xl font-bold mb-8 text-black">Founder Note</h2>
+          <p className="mb-6">Khenti Books started with a simple belief.</p>
+          <p className="mb-6">The right book can change how you see yourself, other people, money, power, work, ambition, and the world around you.</p>
+          <p className="mb-6">For most of my life, books were where I went to ask bigger questions. Over time, I realized the most valuable books are not always the loudest or the most popular ones. They are the ones that quietly stay with you long after you finish the last page.</p>
+          <p className="mb-6">Every single title on this shelf was chosen with that in mind.</p>
+          <p className="mb-6 font-semibold">Welcome to Khenti Books.</p>
+          <p className="mb-6 font-bold text-black">Khenti Emmanuel</p>
+        </div>
+      </section>
 
       <footer className="border-t border-stone-200 mt-20 py-16 text-center text-sm text-stone-500">
         <div className="flex justify-center gap-6 mb-4">
