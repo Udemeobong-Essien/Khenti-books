@@ -45,7 +45,14 @@ export default function App() {
   const [discount, setDiscount] = useState(0); 
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
-  const [password, setPassword] = useState('');
+  const [activeBookIndex, setActiveBookIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveBookIndex((prev) => (prev + 1) % 3);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
@@ -886,7 +893,7 @@ export default function App() {
         ) : (
           <>
             <section className="bg-golden-brown-800 text-white rounded-3xl p-8 md:p-16 mb-12 dark:bg-golden-brown-900">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-8 leading-tight">Some books entertain you.<br />Others quietly change your life.</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-8 leading-tight">Some books entertain you.<br />Others quietly change your life.</h1>
               <div className="relative">
                 <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="flex items-center justify-between w-64 bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
                   <span>Browse Categories</span>
@@ -1282,31 +1289,64 @@ export default function App() {
         </div>
       )}
 
-      <section className="py-16 px-4 md:px-16 border-t">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-black">Khenti Recommends</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <section className="py-16 px-4 md:px-16 border-t bg-white dark:bg-stone-950 transition-colors">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-black dark:text-white mb-2">Khenti Recommends</h2>
+          <p className="text-stone-600 dark:text-stone-400 mb-8">Three books worth your time right now.</p>
+          
+          {/* Desktop Grid */}
+          <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-8">
             {booksState.slice(0, 3).map((book) => (
-              <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center cursor-pointer hover:shadow-lg transition-all" onClick={() => handleBookClick(book)}>
+              <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center">
                 <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
                 <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
                 <p className="text-sm text-stone-500 mb-2">{book.author}</p>
-                <p className="font-bold text-golden-brown-700">₦{book.price.toLocaleString()}</p>
+                <p className="text-sm text-center text-stone-600 mb-4 italic">"This book will reshape your perspective on life's challenges."</p>
+                <p className="font-bold text-golden-brown-700 mb-4">₦{book.price.toLocaleString()}</p>
+                <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-stone-800 transition">Shop Now</button>
               </div>
             ))}
+          </div>
+
+          {/* Mobile Carousel */}
+          <div className="md:hidden relative h-[540px]">
+             {booksState.slice(0, 3).map((book, index) => (
+                <div key={book.id} className={`absolute top-0 left-0 w-full bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center transition-opacity duration-500 ${index === activeBookIndex ? 'opacity-100' : 'opacity-0'}`}>
+                  <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
+                  <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
+                  <p className="text-sm text-stone-500 mb-2">{book.author}</p>
+                  <p className="text-sm text-center text-stone-600 mb-4 italic">"This book will reshape your perspective on life's challenges."</p>
+                  <p className="font-bold text-golden-brown-700 mb-4">₦{book.price.toLocaleString()}</p>
+                  <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-stone-800 transition">Shop Now</button>
+                </div>
+             ))}
+             
+             {/* Navigation buttons */}
+             <button
+               onClick={() => setActiveBookIndex((prev) => (prev - 1 + 3) % 3)}
+               className="absolute top-[25%] left-0 z-10 bg-white p-2 rounded-full shadow-md border"
+             >
+               <ArrowLeft size={20} />
+             </button>
+             <button
+               onClick={() => setActiveBookIndex((prev) => (prev + 1) % 3)}
+               className="absolute top-[25%] right-0 z-10 bg-white p-2 rounded-full shadow-md border"
+             >
+               <ChevronRight size={20} />
+             </button>
           </div>
         </div>
       </section>
 
-      <section className="bg-stone-50 py-16 px-4 md:px-16">
-        <div className="max-w-3xl mx-auto text-stone-800">
-          <h2 className="text-3xl font-bold mb-8 text-black">Founder Note</h2>
+      <section className="bg-stone-100 dark:bg-stone-900/50 py-10 px-6 my-10 rounded-3xl mx-4 md:mx-auto max-w-5xl border border-stone-200 dark:border-stone-700">
+        <div className="max-w-3xl mx-auto text-stone-800 dark:text-stone-300">
+          <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Founder Note</h2>
           <p className="mb-6">Khenti Books started with a simple belief.</p>
           <p className="mb-6">The right book can change how you see yourself, other people, money, power, work, ambition, and the world around you.</p>
           <p className="mb-6">For most of my life, books were where I went to ask bigger questions. Over time, I realized the most valuable books are not always the loudest or the most popular ones. They are the ones that quietly stay with you long after you finish the last page.</p>
           <p className="mb-6">Every single title on this shelf was chosen with that in mind.</p>
           <p className="mb-6 font-semibold">Welcome to Khenti Books.</p>
-          <p className="mb-6 font-bold text-black">Khenti Emmanuel</p>
+          <p className="mb-6 font-bold text-black dark:text-white">Khenti Emmanuel</p>
         </div>
       </section>
 
