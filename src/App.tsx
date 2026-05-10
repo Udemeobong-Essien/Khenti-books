@@ -47,7 +47,11 @@ export default function App() {
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
   const [activeBookIndex, setActiveBookIndex] = useState(0);
-  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const Spinner = () => (
+  <div className="flex justify-center items-center py-20">
+    <Loader2 className="animate-spin text-golden-brown-700" size={48} />
+  </div>
+);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -939,20 +943,7 @@ export default function App() {
               </h2>
 
               {(isSearching || loading) ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {[...Array(8)].map((_, i) => (
-                    <div key={i} className="bg-white dark:bg-stone-800 p-6 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 flex flex-col items-center w-full mx-auto">
-                      <Skeleton className="w-32 h-48 mb-4 rounded-lg shadow-md" />
-                      <Skeleton className="h-4 w-3/4 mb-1" />
-                      <Skeleton className="h-3 w-1/2 mb-2" />
-                      <Skeleton className="h-4 w-1/3 mb-4" />
-                      <div className="flex flex-col gap-2 mt-auto w-full">
-                        <Skeleton className="h-7 w-full rounded-lg" />
-                        <Skeleton className="h-7 w-full rounded-lg" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <Spinner />
               ) : filteredBooks.length > 0 ? (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1004,19 +995,7 @@ export default function App() {
                 <p className="text-center text-stone-500 py-12">No books found matching your search.</p>
               )}
             </section>
-            {(!selectedCategory || selectedCategory === 'All books') && !searchQuery && (
-              <section className="bg-stone-100 dark:bg-stone-900/50 py-10 px-6 my-10 rounded-3xl mx-4 md:mx-auto max-w-5xl border border-stone-200 dark:border-stone-700">
-                <div className="max-w-3xl mx-auto text-stone-800 dark:text-stone-300">
-                  <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Founder Note</h2>
-                  <p className="mb-6">Khenti Books started with a simple belief.</p>
-                  <p className="mb-6">The right book can change how you see yourself, other people, money, power, work, ambition, and the world around you.</p>
-                  <p className="mb-6">For most of my life, books were where I went to ask bigger questions. Over time, I realized the most valuable books are not always the loudest or the most popular ones. They are the ones that quietly stay with you long after you finish the last page.</p>
-                  <p className="mb-6">Every single title on this shelf was chosen with that in mind.</p>
-                  <p className="mb-6 font-semibold">Welcome to Khenti Books.</p>
-                  <p className="mb-6 font-bold text-black dark:text-white">Khenti Emmanuel</p>
-                </div>
-              </section>
-            )}
+
           </>
         )}
       </main>
@@ -1382,6 +1361,21 @@ export default function App() {
       </section>
 
 
+
+
+      {(!selectedCategory || selectedCategory === 'All books') && !searchQuery && (
+        <section className="bg-stone-100 dark:bg-stone-900/50 py-10 px-6 my-10 rounded-3xl mx-4 md:mx-auto max-w-5xl border border-stone-200 dark:border-stone-700">
+          <div className="max-w-3xl mx-auto text-stone-800 dark:text-stone-300">
+            <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Founder Note</h2>
+            <p className="mb-6">Khenti Books started with a simple belief.</p>
+            <p className="mb-6">The right book can change how you see yourself, other people, money, power, work, ambition, and the world around you.</p>
+            <p className="mb-6">For most of my life, books were where I went to ask bigger questions. Over time, I realized the most valuable books are not always the loudest or the most popular ones. They are the ones that quietly stay with you long after you finish the last page.</p>
+            <p className="mb-6">Every single title on this shelf was chosen with that in mind.</p>
+            <p className="mb-6 font-semibold">Welcome to Khenti Books.</p>
+            <p className="mb-6 font-bold text-black dark:text-white">Khenti Emmanuel</p>
+          </div>
+        </section>
+      )}
 
       <footer className="border-t border-stone-200 mt-20 py-16 text-center text-sm text-stone-500">
         <div className="flex justify-center gap-6 mb-4">
