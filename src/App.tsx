@@ -47,6 +47,7 @@ export default function App() {
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
   const [activeBookIndex, setActiveBookIndex] = useState(0);
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const Spinner = () => (
   <div className="flex justify-center items-center py-20">
     <Loader2 className="animate-spin text-golden-brown-700" size={48} />
