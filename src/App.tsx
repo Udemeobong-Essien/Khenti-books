@@ -1383,7 +1383,7 @@ export default function App() {
           <a href="https://www.instagram.com/khentibooks/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex items-center gap-2 text-golden-brown-700">
             <Instagram size={18} /> Instagram
           </a>
-          <a href="https://share.google/WXUrjdbvc1LUio2fc" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex items-center gap-2 font-bold text-golden-brown-700">
+          <a href="https://share.google/WXUrjdbvc1LUio2fc" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex items-center gap-2 text-golden-brown-700">
             <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" /> Google Profile
           </a>
           <a href="tel:+2348104972574" className="hover:underline flex items-center gap-2 text-golden-brown-700">
