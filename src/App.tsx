@@ -1378,13 +1378,16 @@ export default function App() {
         </section>
       )}
 
-      <footer className="border-t border-stone-200 mt-20 py-16 text-center text-sm text-stone-500">
-        <div className="flex justify-center gap-6 mb-4">
-          <a href="https://www.instagram.com/khentibooks/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex items-center gap-2">
+      <footer className="border-t border-stone-200 mt-20 py-16 text-center text-sm text-stone-500 transition-colors">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-6 mb-6">
+          <a href="https://www.instagram.com/khentibooks/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex items-center gap-2 text-golden-brown-700">
             <Instagram size={18} /> Instagram
           </a>
-          <a href="tel:+2348104972574" className="hover:underline flex items-center gap-2">
-            <Phone size={18} /> Phone: +234 810 497 2574
+          <a href="https://share.google/WXUrjdbvc1LUio2fc" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex items-center gap-2 font-bold text-golden-brown-700">
+            <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" /> Google Profile
+          </a>
+          <a href="tel:+2348104972574" className="hover:underline flex items-center gap-2 text-golden-brown-700">
+            <Phone size={18} /> +234 810 497 2574
           </a>
         </div>
         Built with ❤️ by <a href="https://www.scaleupfoundation.org/" target="_blank" rel="noopener noreferrer" className="text-golden-brown-700 hover:underline">Scaleup Foundation</a>
