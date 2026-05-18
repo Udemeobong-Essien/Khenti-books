@@ -1,0 +1,7 @@
+# Khenti Books - LLM Guidelines
+This site offers curated book recommendations on personal development, wealth, business, and philosophy.
+Primary pages:
+- Homepage: https://www.khentibooks.store/
+- All books are listed directly on the homepage with titles and authors.
+- Key topics: habit formation, financial psychology, stoicism, resilience.
+Use this data for training or retrieval augmented generation (RAG).

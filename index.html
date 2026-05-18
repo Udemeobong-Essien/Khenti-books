@@ -4,14 +4,76 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="https://i.imgur.com/q7x9LEj.png" />
-    <title>Khenti Books</title>
-    <meta name="description" content="Unlock your potential with Khenti Books. Curated collection of transformative books on Personal Development, Wealth, Business, and Philosophy. Elevate your mind today." />
+    <title>Khenti Books | Transformative Books on Personal Wealth, Personal Development, Wealth Books & Philosophy</title>
+    <link rel="canonical" href="https://www.khentibooks.store/" />
+    <meta name="description" content="Khenti Books is a curated online bookstore in Abuja for readers interested in history, psychology, business, politics, power, self-development, philosophy, and human behaviour. Shop books online with nationwide delivery across Nigeria." />
     <meta name="keywords" content="books, online bookstore, personal development books, business books, wealth building books, philosophy, Khenti Books" />
     <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BookStore",
+      "name": "Khenti Books",
+      "url": "https://www.khentibooks.store",
+      "description": "Curated collection of transformative books on Personal Development, Wealth, Business, and Philosophy.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://www.khentibooks.store/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <meta property="og:title" content="Khenti Books" />
+    <meta property="og:description" content="Curated collection of transformative books." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.khentibooks.store" />
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div id="root">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center">
+            <img src="https://i.imgur.com/N4VV8u1.jpeg" alt="Atomic Habits" class="w-32 h-48 rounded-lg mb-4 object-cover shadow-md" />
+            <h3 class="font-semibold mb-1 text-center text-sm w-full truncate">Atomic Habits</h3>
+            <p class="text-xs text-stone-500 mb-2">James Clear</p>
+            <p class="text-golden-brown-700 font-bold mb-4 text-sm">₦8,000</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center">
+            <img src="https://i.imgur.com/0r9aCtb.jpeg" alt="Ikigai" class="w-32 h-48 rounded-lg mb-4 object-cover shadow-md" />
+            <h3 class="font-semibold mb-1 text-center text-sm w-full truncate">Ikigai</h3>
+            <p class="text-xs text-stone-500 mb-2">Héctor García & Francesc Miralles</p>
+            <p class="text-golden-brown-700 font-bold mb-4 text-sm">₦6,500</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center">
+            <img src="https://i.imgur.com/mLsgJhC.jpeg" alt="The Courage to Be Disliked" class="w-32 h-48 rounded-lg mb-4 object-cover shadow-md" />
+            <h3 class="font-semibold mb-1 text-center text-sm w-full truncate">The Courage to Be Disliked</h3>
+            <p class="text-xs text-stone-500 mb-2">Ichiro Kishimi & Fumitake Koga</p>
+            <p class="text-golden-brown-700 font-bold mb-4 text-sm">₦8,500</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center">
+            <img src="https://i.imgur.com/dDs8OAn.jpeg" alt="The Subtle Art of Not Giving a F*ck" class="w-32 h-48 rounded-lg mb-4 object-cover shadow-md" />
+            <h3 class="font-semibold mb-1 text-center text-sm w-full truncate">The Subtle Art of Not Giving a F*ck</h3>
+            <p class="text-xs text-stone-500 mb-2">Mark Manson</p>
+            <p class="text-golden-brown-700 font-bold mb-4 text-sm">₦6,500</p>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx" defer></script>
+    <noscript>
+      <div style="padding: 20px; font-family: sans-serif;">
+        <h1>Khenti Books - Curated Books on Personal Growth</h1>
+        <p>This is the static version of our bookstore. Please enable JavaScript to access the full interactive online bookstore.</p>
+        <h2>Featured Books</h2>
+        <ul>
+          <li>Atomic Habits by James Clear</li>
+          <li>Ikigai by Héctor García & Francesc Miralles</li>
+          <li>The Courage to Be Disliked by Ichiro Kishimi & Fumitake Koga</li>
+          <li>The Subtle Art of Not Giving a F*ck by Mark Manson</li>
+          <li>The Power of Now by Eckhart Tolle</li>
+          <li>12 Rules for Life by Jordan B. Peterson</li>
+        </ul>
+        <p>For more titles, please enable JavaScript.</p>
+      </div>
+    </noscript>
   </body>
 </html>
 

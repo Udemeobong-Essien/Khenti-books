@@ -1365,17 +1365,31 @@ export default function App() {
 
 
       {(!selectedCategory || selectedCategory === 'All books') && !searchQuery && (
-        <section className="bg-stone-100 dark:bg-stone-900/50 py-10 px-6 my-10 rounded-3xl mx-4 md:mx-auto max-w-5xl border border-stone-200 dark:border-stone-700">
-          <div className="max-w-3xl mx-auto text-stone-800 dark:text-stone-300">
-            <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Founder Note</h2>
-            <p className="mb-6">Khenti Books started with a simple belief.</p>
-            <p className="mb-6">The right book can change how you see yourself, other people, money, power, work, ambition, and the world around you.</p>
-            <p className="mb-6">For most of my life, books were where I went to ask bigger questions. Over time, I realized the most valuable books are not always the loudest or the most popular ones. They are the ones that quietly stay with you long after you finish the last page.</p>
-            <p className="mb-6">Every single title on this shelf was chosen with that in mind.</p>
-            <p className="mb-6 font-semibold">Welcome to Khenti Books.</p>
-            <p className="mb-6 font-bold text-black dark:text-white">Khenti Emmanuel</p>
-          </div>
-        </section>
+        <>
+          <section className="bg-stone-100 dark:bg-stone-900/50 py-10 px-6 my-10 rounded-3xl mx-4 md:mx-auto max-w-5xl border border-stone-200 dark:border-stone-700">
+            <div className="max-w-3xl mx-auto text-stone-800 dark:text-stone-300">
+              <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Founder Note</h2>
+              <p className="mb-6">I have loved books for as long as I can remember.</p>
+              <p className="mb-6">As a child, reading was curiosity, escape, and habit all at once. Over time, it became something deeper.</p>
+              <p className="mb-6">Books changed how I saw ambition, money, human nature, and the world around me. More importantly, they taught me that the right book, at the right moment in someone’s life, can genuinely shift the way they think.</p>
+              <p className="mb-6">Khenti Books came from that belief.</p>
+              <p className="mb-6">Every title here was chosen deliberately. Not because it was trendy, but because it offers something worth carrying with you long after the last page.</p>
+              <p className="mb-6">Welcome to Khenti Books.</p>
+              <p className="mb-6 font-bold text-black dark:text-white">— Khenti Emmanuel</p>
+            </div>
+          </section>
+
+          <section className="bg-stone-100 dark:bg-stone-900/50 py-10 px-6 my-10 rounded-3xl mx-4 md:mx-auto max-w-5xl border border-stone-200 dark:border-stone-700">
+            <div className="max-w-3xl mx-auto text-stone-800 dark:text-stone-300">
+              <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Why Curated Knowledge Matters</h2>
+              <p className="mb-6">In an era of information overload, finding the right book can feel like searching for a needle in a haystack. At Khenti Books, we believe in the power of quality over quantity. Our bookstore in Abuja is dedicated to bringing you a meticulously curated collection that focuses on the topics that truly matter for your personal and professional growth.</p>
+              <p className="mb-6">We specialize in books that explore the deep dynamics of human experience: <strong>History</strong> provides the lens through which we view our past to understand the present. <strong>Psychology</strong> offers the foundational understanding of why we behave the way we do. <strong>Business</strong> and <strong>Money</strong> are explored not just through tactics, but through the mindset and strategies that build genuine, sustainable wealth.</p>
+              <p className="mb-6">Our collection also ventures into the realms of <strong>Politics</strong> and <strong>Power</strong>, helping you decode the mechanisms that shape societies and systems. <strong>Self-Development</strong> is not just about productivity hacks here; it is about building a foundation of resilience, discipline, and purpose. Finally, our <strong>Philosophy</strong> section engages the timeless questions, helping you develop a framework for critical thinking and a deeper engagement with life.</p>
+              <p className="mb-6">Whether you are a student, a professional, or simply a lifelong learner, Khenti Books is your gateway to intellectual enrichment. We are proud to serve readers across Nigeria, offering nationwide delivery so that the transformative power of these books is accessible to you, wherever you are. By choosing Khenti Books, you aren't just buying a book; you are investing in a curated map for navigating the complexities of human behaviour and the modern world.</p>
+              <p className="mb-6">Explore our collection today and let the right book, at the right moment, change your path.</p>
+            </div>
+          </section>
+        </>
       )}
 
       <footer className="border-t border-stone-200 mt-20 py-16 text-center text-sm text-stone-500 transition-colors">
