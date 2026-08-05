@@ -921,7 +921,8 @@ export default function App() {
           </div>
         ) : (
           <>
-            <section className="bg-golden-brown-800 text-white rounded-3xl p-6 md:p-8 mb-12 dark:bg-golden-brown-900">
+            <section className="bg-golden-brown-800 text-white rounded-3xl p-8 md:p-16 mb-12 dark:bg-golden-brown-900">
+              <h1 className="text-base sm:text-xl md:text-3xl font-bold mb-8 leading-tight">What You Read Shapes Who You Become</h1>
               <div className="relative">
                 <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="flex items-center justify-between w-64 bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
                   <span>Browse Categories</span>
@@ -1311,12 +1312,11 @@ export default function App() {
           <p className="text-stone-600 dark:text-stone-400 mb-8">Three books worth your time right now.</p>
           
           {/* Desktop Grid */}
-          <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="hidden md:flex justify-center">
             {booksState
-              .filter(book => !selectedBook || book.id !== selectedBook.id)
-              .slice(0, 3)
+              .filter(book => book.id === 3)
               .map((book) => (
-              <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center">
+              <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center w-80">
                 <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
                 <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
                 <p className="text-sm text-stone-500 mb-2">{book.author}</p>
@@ -1327,13 +1327,12 @@ export default function App() {
             ))}
           </div>
 
-          {/* Mobile Carousel */}
-          <div className="md:hidden relative h-[540px]">
-             {booksState
-              .filter(book => !selectedBook || book.id !== selectedBook.id)
-              .slice(0, 3)
-              .map((book, index) => (
-                <div key={book.id} className={`absolute top-0 left-0 w-full bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center transition-opacity duration-500 ${index === activeBookIndex ? 'opacity-100' : 'opacity-0'}`}>
+          {/* Mobile View */}
+          <div className="md:hidden flex justify-center">
+            {booksState
+              .filter(book => book.id === 3)
+              .map((book) => (
+                <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center w-80">
                   <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
                   <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
                   <p className="text-sm text-stone-500 mb-2">{book.author}</p>
@@ -1341,21 +1340,7 @@ export default function App() {
                   <p className="font-bold text-golden-brown-700 mb-4">₦{book.price.toLocaleString()}</p>
                   <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-golden-brown-700 transition">Shop Now</button>
                 </div>
-             ))}
-             
-             {/* Navigation buttons */}
-             <button
-               onClick={() => setActiveBookIndex((prev) => (prev - 1 + 3) % 3)}
-               className="absolute top-[25%] left-0 z-10 bg-white p-2 rounded-full shadow-md border"
-             >
-               <ArrowLeft size={20} />
-             </button>
-             <button
-               onClick={() => setActiveBookIndex((prev) => (prev + 1) % 3)}
-               className="absolute top-[25%] right-0 z-10 bg-white p-2 rounded-full shadow-md border"
-             >
-               <ChevronRight size={20} />
-             </button>
+              ))}
           </div>
         </div>
       </section>
@@ -1403,7 +1388,7 @@ export default function App() {
             <Phone size={18} /> +234 810 497 2574
           </a>
         </div>
-        Built with ❤️ by <a href="https://www.scaleupfoundation.org/" target="_blank" rel="noopener noreferrer" className="text-golden-brown-700 hover:underline">Scaleup Foundation</a>
+        Built with ❤️ by <a href="https://www.scaleupfoundation.org/" target="_blank" rel="noopener noreferrer" className="text-golden-brown-700 hover:underline">ScaleUp</a>
       </footer>
 
       {/* Back to Top Button */}
