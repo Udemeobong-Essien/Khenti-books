@@ -46,20 +46,12 @@ export default function App() {
   const [discount, setDiscount] = useState(0); 
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
-  const [activeBookIndex, setActiveBookIndex] = useState(0);
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const Spinner = () => (
   <div className="flex justify-center items-center py-20">
     <Loader2 className="animate-spin text-golden-brown-700" size={48} />
   </div>
 );
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveBookIndex((prev) => (prev + 1) % 3);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
@@ -663,13 +655,23 @@ export default function App() {
           </div>
         </div>
       )}
-      <div className="bg-golden-brown-800 text-white text-xs font-bold md:font-extrabold py-2 px-6 flex justify-center">
-        {user ? 'HEY READER, WELCOME TO KHENTI BOOKS' : 'WELCOME TO KHENTI BOOKS'}
+      <div className="bg-golden-brown-700 text-white text-xs font-bold md:font-extrabold py-2 overflow-hidden whitespace-nowrap">
+        <div className="animate-marquee-rtl">
+          {[0, 1].map((group) => (
+            <div key={group} className="flex shrink-0 items-center" aria-hidden={group === 1}>
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <span key={idx} className="mx-12">
+                  Free shipping within Nigeria for all orders over ₦100,000
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
       <header className="sticky top-0 z-50 border-b bg-white border-stone-200 dark:bg-stone-900 dark:border-stone-700">
-        <nav className="w-full max-w-7xl mx-auto px-2 py-2 flex items-center justify-between">
+        <nav className="w-full max-w-7xl mx-auto px-2 py-1 flex items-center justify-between">
           <div className="cursor-pointer" onClick={() => { setSelectedBook(null); setActiveView('products'); setSelectedCategory('All books'); setSearchQuery(''); }}>
-              <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-16 h-16 md:w-32 md:h-32 object-contain" />
+              <img src="https://i.imgur.com/q7x9LEj.png" alt="Logo" className="w-9 h-9 md:w-16 md:h-16 object-contain" />
           </div>
           <div className="flex items-center gap-2 md:gap-4 ml-auto">
             {user ? (
@@ -741,6 +743,26 @@ export default function App() {
           </div>
         )}
       </header>
+
+      {activeView !== 'orders' && !isLoadingBooks && !selectedBook && (
+        <section className="w-full bg-[#c49a5a]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+            <div className="relative inline-block">
+              <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="flex items-center justify-between w-64 bg-white text-golden-brown-800 px-6 py-2.5 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
+                <span>Browse Categories</span>
+                <ChevronDown size={20} />
+              </button>
+              {isCategoriesOpen && (
+                <div className="absolute top-full left-0 mt-2 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-2 w-48 shadow-xl z-50 text-stone-900 dark:text-stone-100">
+                  {categories.map(cat => (
+                    <button key={cat} onClick={() => { setSelectedCategory(cat === 'All' ? null : cat); setActiveView('products'); setIsCategoriesOpen(false); }} className="block w-full text-left px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-lg">{cat}</button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
         {error && (
@@ -921,23 +943,6 @@ export default function App() {
           </div>
         ) : (
           <>
-            <section className="bg-golden-brown-800 text-white rounded-3xl p-8 md:p-16 mb-12 dark:bg-golden-brown-900">
-              <h1 className="text-base sm:text-xl md:text-3xl font-bold mb-8 leading-tight">What You Read Shapes Who You Become</h1>
-              <div className="relative">
-                <button onClick={() => setIsCategoriesOpen(!isCategoriesOpen)} className="flex items-center justify-between w-64 bg-white text-golden-brown-800 px-6 py-3 rounded-full font-semibold hover:bg-golden-brown-50 transition dark:bg-stone-800 dark:text-white dark:hover:bg-stone-700">
-                  <span>Browse Categories</span>
-                  <ChevronDown size={20} />
-                </button>
-                {isCategoriesOpen && (
-                  <div className="absolute top-full left-0 mt-2 bg-white dark:bg-stone-800 border rounded-2xl p-2 w-48 shadow-xl z-50 text-stone-900 dark:text-stone-100">
-                    {categories.map(cat => (
-                      <button key={cat} onClick={() => { setSelectedCategory(cat === 'All' ? null : cat); setActiveView('products'); setIsCategoriesOpen(false); }} className="block w-full text-left px-4 py-2 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-lg">{cat}</button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </section>
-
             <section>
               <h2 className="text-2xl font-bold mb-8">
                 {selectedCategory ? selectedCategory : searchQuery ? `Search Results for "${searchQuery}"` : 'All books'}
@@ -1304,76 +1309,6 @@ export default function App() {
             </button>
           </div>
         </div>
-      )}
-
-      <section className="py-16 px-4 md:px-16 border-t bg-white dark:bg-stone-950 transition-colors">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-black dark:text-white mb-2">Khenti Recommends</h2>
-          <p className="text-stone-600 dark:text-stone-400 mb-8">Three books worth your time right now.</p>
-          
-          {/* Desktop Grid */}
-          <div className="hidden md:flex justify-center">
-            {booksState
-              .filter(book => book.id === 3)
-              .map((book) => (
-              <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center w-80">
-                <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
-                <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
-                <p className="text-sm text-stone-500 mb-2">{book.author}</p>
-                <p className="text-sm text-center text-stone-600 mb-4 italic">"{book.synopsis.substring(0, 100)}..."</p>
-                <p className="font-bold text-golden-brown-700 mb-4">₦{book.price.toLocaleString()}</p>
-                <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-golden-brown-700 transition">Shop Now</button>
-              </div>
-            ))}
-          </div>
-
-          {/* Mobile View */}
-          <div className="md:hidden flex justify-center">
-            {booksState
-              .filter(book => book.id === 3)
-              .map((book) => (
-                <div key={book.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center w-80">
-                  <img src={book.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={book.title} className="w-40 h-60 rounded-lg mb-4 object-cover shadow-md" referrerPolicy="no-referrer" />
-                  <h3 className="font-semibold text-center mb-1 text-black">{book.title}</h3>
-                  <p className="text-sm text-stone-500 mb-2">{book.author}</p>
-                  <p className="text-sm text-center text-stone-600 mb-4 italic">"{book.synopsis.substring(0, 100)}..."</p>
-                  <p className="font-bold text-golden-brown-700 mb-4">₦{book.price.toLocaleString()}</p>
-                  <button onClick={() => handleBookClick(book)} className="bg-stone-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-golden-brown-700 transition">Shop Now</button>
-                </div>
-              ))}
-          </div>
-        </div>
-      </section>
-
-
-
-
-      {(!selectedCategory || selectedCategory === 'All books') && !searchQuery && (
-        <>
-          <section className="bg-stone-100 dark:bg-stone-900/50 py-10 px-6 my-10 rounded-3xl mx-4 md:mx-auto max-w-5xl border border-stone-200 dark:border-stone-700">
-            <div className="max-w-3xl mx-auto text-stone-800 dark:text-stone-300">
-              <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Founder Note</h2>
-              <p className="mb-6">I have loved books for as long as I can remember.</p>
-              <p className="mb-6">As a child, reading was curiosity, escape, and habit all at once. Over time, it became something deeper.</p>
-              <p className="mb-6">Books changed how I saw ambition, money, human nature, and the world around me. More importantly, they taught me that the right book, at the right moment in someone’s life, can genuinely shift the way they think.</p>
-              <p className="mb-6">Khenti Books came from that belief.</p>
-              <p className="mb-6">Every title here was chosen deliberately. Not because it was trendy, but because it offers something worth carrying with you long after the last page.</p>
-              <p className="mb-6">Welcome to Khenti Books.</p>
-              <p className="mb-6 font-bold text-black dark:text-white">— Khenti Emmanuel</p>
-            </div>
-          </section>
-
-          <section className="bg-stone-100 dark:bg-stone-900/50 py-10 px-6 my-10 rounded-3xl mx-4 md:mx-auto max-w-5xl border border-stone-200 dark:border-stone-700">
-            <div className="max-w-3xl mx-auto text-stone-800 dark:text-stone-300">
-              <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Why Curated Knowledge Matters</h2>
-              <p className="mb-6">In an era of information overload, finding the right book can feel like searching for a needle in a haystack. At Khenti Books, we believe in the power of quality over quantity. Our bookstore in Abuja is dedicated to bringing you a meticulously curated collection that focuses on the topics that truly matter for your personal and professional growth.</p>
-              <p className="mb-6">We specialize in books that explore the deep dynamics of human experience: <strong>History</strong> provides the lens through which we view our past to understand the present. <strong>Psychology</strong> offers the foundational understanding of why we behave the way we do. <strong>Business</strong> and <strong>Money</strong> are explored not just through tactics, but through the mindset and strategies that build genuine, sustainable wealth.</p>
-              <p className="mb-6">Our collection also ventures into the realms of <strong>Politics</strong> and <strong>Power</strong>, helping you decode the mechanisms that shape societies and systems. <strong>Self-Development</strong> is not just about productivity hacks here; it is about building a foundation of resilience, discipline, and purpose. Finally, our <strong>Philosophy</strong> section engages the timeless questions, helping you develop a framework for critical thinking and a deeper engagement with life.</p>
-              <p className="mb-6">Whether you are a student, a professional, or simply a lifelong learner, Khenti Books is your gateway to intellectual enrichment. We are proud to serve readers across Nigeria, offering nationwide delivery so that the transformative power of these books is accessible to you, wherever you are. By choosing Khenti Books, you aren't just buying a book; you are investing in a curated map for navigating the complexities of human behaviour and the modern world.</p>
-              <p className="mb-6">Explore our collection today and let the right book, at the right moment, change your path.</p>
-            </div>
-          </section>
-        </>
       )}
 
       <footer className="border-t border-stone-200 mt-20 py-16 text-center text-sm text-stone-500 transition-colors">

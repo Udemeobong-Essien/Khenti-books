@@ -1,13 +1,18 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
 
 @theme {
   --font-sans: "Lato", sans-serif;
   --font-serif: "Lato", sans-serif;
-  --color-golden-brown-50: #fefce8;
-  --color-golden-brown-100: #fef9c3;
-  --color-golden-brown-700: #a16207;
-  --color-golden-brown-800: #854d0e;
+  --color-golden-brown-50: #fbf7f0;
+  --color-golden-brown-100: #f5ecdc;
+  --color-golden-brown-200: #ead6b5;
+  --color-golden-brown-300: #ddbe8c;
+  --color-golden-brown-400: #d0aa6f;
+  --color-golden-brown-500: #c49a5a;
+  --color-golden-brown-600: #c49a5a;
+  --color-golden-brown-700: #c49a5a;
+  --color-golden-brown-800: #ac8244;
+  --color-golden-brown-900: #8f6a34;
 }
 
 @layer base {
@@ -22,3 +27,21 @@
   }
 }
 
+@keyframes marquee-rtl {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-rtl {
+  display: flex;
+  width: max-content;
+  animation: marquee-rtl 36s linear infinite;
+}
+
+.animate-marquee-rtl:hover {
+  animation-play-state: paused;
+}
