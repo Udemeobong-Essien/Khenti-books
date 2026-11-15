@@ -74,11 +74,13 @@ async function startServer() {
       const response = await getPaystack().transaction.verify(reference);
       
       if (response && response.data && response.data.status === 'success') {
-        const orderId = response.data.metadata.orderId as string;
-        await db.collection('orders').doc(orderId).update({
-          status: 'paid',
-          paymentDetails: response.data
-        });
+        const orderId = response.data.metadata?.orderId as string | undefined;
+        if (orderId) {
+          await db.collection('orders').doc(orderId).set({
+            status: 'paid',
+            paymentDetails: response.data
+          }, { merge: true });
+        }
         res.json({ success: true, data: response.data });
       } else {
         res.status(400).json({ error: "Payment verification failed" });

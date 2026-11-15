@@ -14,7 +14,7 @@ export default function Cart({ isOpen, onClose, cart, updateQuantity, removeItem
         <div className="flex-grow overflow-y-auto">
           {cart.map((item) => (
             <div key={item.id} className="flex items-center gap-4 mb-4 border-b pb-4">
-              <img src={item.coverImageUrl || 'https://placehold.co/400x400?text=Book+Cover'} alt={item.title} className="w-16 h-16 rounded-lg object-cover" referrerPolicy="no-referrer" />
+              <img src={item.coverImageUrl || 'https://placehold.co/400x600?text=Book+Cover'} alt={item.title} className="w-12 h-18 rounded-lg object-cover shrink-0" referrerPolicy="no-referrer" />
               <div className="flex-grow">
                 <h4 className="font-semibold">{item.title}</h4>
                 <p className="text-sm text-stone-600">{item.author}</p>
