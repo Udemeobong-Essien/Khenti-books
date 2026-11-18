@@ -199,7 +199,7 @@ export default function App() {
     { id: 28, title: 'Unfu*k Yourself', author: 'Gary John Bishop', price: 7500, synopsis: "A no-nonsense guide to getting out of your own way. Bishop argues that the source of most failure is the stories people tell themselves — and that by changing the assertions you make about yourself, you change your reality. Written in the voice of a Scottish life coach who doesn't tolerate self-pity.", authorBio: 'Gary John Bishop is an author and personal development expert.', reviews: [], coverImageUrl: '/covers/unfu-k-yourself-gary-john-bishop.jpg', publicationDate: '2017-01-31', pageCount: 176, category: 'SELF HELP' },
     { id: 29, title: 'Hyperfocus', author: 'Chris Bailey', price: 7500, synopsis: "A counterintuitive guide to productivity that argues we need two modes of thinking: hyperfocus (deep, intentional concentration on one task) and scatterfocus (deliberately letting the mind wander to enable creativity and problem-solving). Bailey shows how to toggle between these modes to become exponentially more effective.", authorBio: 'Chris Bailey is a productivity expert and author.', reviews: [], coverImageUrl: '/covers/hyperfocus-chris-bailey.jpg', publicationDate: '2018-09-04', pageCount: 256, category: 'SELF HELP' },
     { id: 30, title: 'Dopamine Detox', author: 'Thibaut Meurisse', price: 6500, synopsis: "A guide to reclaiming control of your attention in an age of addictive technology. Meurisse explains how constant stimulation from social media, entertainment, and notifications depletes motivation and focus, and provides a practical protocol for resetting your dopamine system to restore drive and clarity.", authorBio: 'Thibaut Meurisse is an author focusing on productivity and personal development.', reviews: [], coverImageUrl: '/covers/dopamine-detox-thibaut-meurisse.jpg', publicationDate: '2020', pageCount: 132, category: 'SELF HELP' },
-    { id: 31, title: 'Who Moved My Cheese?', author: 'Spencer Johnson', price: 5500, synopsis: "A parable about two mice and two tiny humans who live in a maze and depend on cheese for their happiness. When the cheese moves, their responses reveal everything about how people deal with change. A deceptively simple story with a profound message about adaptability and letting go.", authorBio: 'Spencer Johnson was an American physician and author.', reviews: [], coverImageUrl: '/covers/who-moved-my-cheese-spencer-johnson.jpg', publicationDate: '1998-09-08', pageCount: 96, category: 'SELF HELP' },
+    { id: 31, title: 'Who Moved My Cheese?', author: 'Spencer Johnson', price: 500, synopsis: "A parable about two mice and two tiny humans who live in a maze and depend on cheese for their happiness. When the cheese moves, their responses reveal everything about how people deal with change. A deceptively simple story with a profound message about adaptability and letting go.", authorBio: 'Spencer Johnson was an American physician and author.', reviews: [], coverImageUrl: '/covers/who-moved-my-cheese-spencer-johnson.jpg', publicationDate: '1998-09-08', pageCount: 96, category: 'SELF HELP' },
     { id: 32, title: 'How to Get from Where You Are to Where You Want to Be', author: 'Jack Canfield', price: 8500, synopsis: "Known as The Success Principles, this book presents 64 timeless principles used by successful men and women throughout history. Canfield distils decades of research and experience into practical strategies for taking 100% responsibility for your life and achieving any goal you set.", authorBio: 'Jack Canfield is an American author and motivational speaker.', reviews: [], coverImageUrl: '/covers/how-to-get-from-where-you-are-to-where-you-want-to-be-jack-canfield.jpg', publicationDate: '2005', pageCount: 512, category: 'SELF HELP' },
     { id: 33, title: 'Single on Purpose', author: 'John Kim', price: 6500, synopsis: "A guide to using the single life as an opportunity for radical self-discovery and growth rather than a period of waiting for love. Kim challenges readers to build a rich relationship with themselves — to find purpose, heal old wounds, and develop a strong sense of self — before seeking it from a partner.", authorBio: 'John Kim is a licensed therapist and author.', reviews: [], coverImageUrl: '/covers/single-on-purpose-john-kim.jpg', publicationDate: '2021-03-16', pageCount: 256, category: 'SELF HELP' },
     { id: 34, title: 'The Power of Self-Discipline', author: 'Brian Tracy', price: 7000, synopsis: "A guide to building the self-discipline that separates the extraordinary from the ordinary. Walter examines the psychology of discipline, explains why willpower fails, and presents practical strategies for building daily habits that compound into lasting achievement.", authorBio: 'Brian Tracy is a self-development author and motivational speaker.', reviews: [], coverImageUrl: '/covers/the-power-of-self-discipline-brian-tracy.jpg', publicationDate: '2020', pageCount: 188, category: 'SELF HELP' },
@@ -556,13 +556,15 @@ export default function App() {
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [shuffleSeed, setShuffleSeed] = useState(() => Math.floor(Math.random() * 2147483647) + 1);
+  const [hasRandomized, setHasRandomized] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const booksPerPage = 12;
 
   useEffect(() => {
     const interval = setInterval(() => {
+      setHasRandomized(true);
       setShuffleSeed(Math.floor(Math.random() * 2147483647) + 1);
-    }, 10 * 60 * 1000);
+    }, 60 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -756,11 +758,18 @@ export default function App() {
         const j = Math.floor(nextRandom() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
+      if (!hasRandomized) {
+        const testIdx = shuffled.findIndex(b => b.id === 31);
+        if (testIdx > 0) {
+          const [testBook] = shuffled.splice(testIdx, 1);
+          shuffled.unshift(testBook);
+        }
+      }
       return shuffled;
     }
 
     return result;
-  }, [booksState, searchQuery, selectedCategory, selectedAuthor, priceRange, yearRange, pageCountRange, shuffleSeed]);
+  }, [booksState, searchQuery, selectedCategory, selectedAuthor, priceRange, yearRange, pageCountRange, shuffleSeed, hasRandomized]);
 
   const categories = useMemo(() => ['All books', ...new Set(booksState.map(b => toTitleCase(b.category)))], [booksState]);
 
@@ -1274,7 +1283,7 @@ export default function App() {
                 <span>Total:</span>
                 <span>₦{totalPrice}</span>
               </div>
-              <button onClick={startCheckout} className="w-full bg-golden-brown-700 text-white py-3 rounded-xl font-semibold">Checkout</button>
+              <button onClick={startCheckout} className="w-full bg-golden-brown-700 text-white py-3 rounded-xl font-semibold hover:bg-golden-brown-800 transition cursor-pointer">Checkout</button>
             </div>
           </div>
         </div>
