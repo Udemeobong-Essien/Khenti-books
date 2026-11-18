@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { ShoppingCart, Search, Menu, X, Plus, Minus, Trash2, ChevronRight, CheckCircle, ArrowLeft, Loader2, Sun, Moon, Heart, ChevronUp, MessageCircle, Instagram, Phone, ChevronDown } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { Skeleton } from './components/Skeleton';
@@ -624,13 +624,26 @@ export default function App() {
   };
 
   const [suggestions, setSuggestions] = useState<Book[]>([]);
+  const skipSuggestionsRef = useRef(false);
 
   // Update suggestions dynamically in an effect
   useEffect(() => {
+    if (skipSuggestionsRef.current) {
+      skipSuggestionsRef.current = false;
+      setSuggestions([]);
+      return;
+    }
     if (searchQuery.length > 0) {
-      const filtered = booksState.filter((book) =>
-        book.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const seenTitles = new Set<string>();
+      const filtered = booksState.filter((book) => {
+        const key = book.title.trim().toLowerCase();
+        if (seenTitles.has(key)) return false;
+        if (key.includes(searchQuery.toLowerCase())) {
+          seenTitles.add(key);
+          return true;
+        }
+        return false;
+      });
       setSuggestions(filtered.slice(0, 5));
     } else {
       setSuggestions([]);
@@ -815,6 +828,25 @@ export default function App() {
     setSelectedBook(book);
   };
 
+  const handleSearchSubmit = (queryOverride?: string) => {
+    const query = queryOverride !== undefined ? queryOverride : searchQuery;
+    if (queryOverride !== undefined) {
+      skipSuggestionsRef.current = true;
+      setSearchQuery(queryOverride);
+    }
+    setSelectedBook(null);
+    setQuickViewBook(null);
+    setActiveView('products');
+    if (query.trim() !== '') {
+      setSelectedCategory(null);
+    }
+    setCurrentPage(1);
+    setSuggestions([]);
+    setIsCategoriesOpen(false);
+    setIsMobileMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className={`min-h-screen font-sans ${theme === 'dark' ? 'bg-stone-900 text-stone-100' : 'bg-stone-50 text-stone-900'}`}>
       {error && (
@@ -854,10 +886,18 @@ export default function App() {
                 <button onClick={() => setIsLoginOpen(true)} className="hidden md:block text-[11px] font-bold text-white hover:text-golden-brown-200 mr-4">Login</button>
               </>
             )}
-            <div className="relative">
-              <Search className="w-5 h-5 absolute left-2 top-1/2 -translate-y-1/2 text-white" />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSearchSubmit();
+                (document.activeElement as HTMLElement | null)?.blur();
+              }}
+              className="relative"
+            >
+              <Search className="w-5 h-5 absolute left-2 top-1/2 -translate-y-1/2 text-white pointer-events-none" />
               <input
                 type="text"
+                enterKeyHint="search"
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => {
@@ -874,17 +914,14 @@ export default function App() {
                     <div
                       key={book.id}
                       className="px-4 py-2 hover:bg-stone-800 cursor-pointer text-sm text-white"
-                      onClick={() => {
-                        setSearchQuery(book.title);
-                        setSuggestions([]);
-                      }}
+                      onClick={() => handleSearchSubmit(book.title)}
                     >
                       {book.title}
                     </div>
                   ))}
                 </div>
               )}
-            </div>
+            </form>
             <div className="relative cursor-pointer bg-stone-900 p-2 rounded-full" onClick={() => setIsCartOpen(true)}>
               <ShoppingCart className="w-5 h-5 text-white hover:text-golden-brown-200" />
               {totalItems > 0 && (
